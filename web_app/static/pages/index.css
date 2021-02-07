@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;300;400;500;700;900&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    font-family: 'Noto Sans JP', sans-serif;
+}
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+body main {
+    min-height: 80vh;
+    background-image: url("../images/background.jpg");
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-size: cover;
+}
+
+.main__content div{
+    padding: 20% 0;
+    text-align: center;
+    margin: auto;
+
+}
+
+.main__content div h1 {
+    font-family: 'Playfair Display', sans-serif;
+    font-weight: 500;
+    font-size: 3.4em;
+
+    margin: auto;
+
+    color: white;
+}
+.main__content div h3 {
+    font-family: 'Playfair Display', sans-serif;
+    font-weight: 500;
+    font-size: 1.3em;
+
+    margin: auto;
+    padding-top: 1em;
+
+    color: #a7a7a7;
+}
+
+@media(max-width: 600px) {
+    .main__content div {
+        padding: 45% 0;
+    }
+}

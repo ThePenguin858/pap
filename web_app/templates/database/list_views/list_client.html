@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+{% load static %}
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <title>Listar Clientes</title> <link rel="stylesheet" href="{% static 'lists/lists.css' %}">
+
+</head>
+
+<body >
+    {% include "bases/navbar.html" %}
+    <main>
+        {% if user.is_authenticated %}
+        <div class="content">
+            <p class="content__warn"> INFO: Clique num dos elementos da tabela para apresentar os detalhes de cada cliente</p>
+            <table class="content__table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Nif</th>
+                        <th>Contacto</th>
+                        <th>Apagar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for instance in object_list %}
+                    <tr>
+                        <td><a href='{{ instance.get_absolute_url }}'>{{ instance.name }}</a></td>
+                        <td> <a href='{{ instance.get_absolute_url }}'>{{ instance.nif }}</a></td>
+                        <td><a href='{{ instance.get_absolute_url }}'>
+                                {% if instance.contact_phone %}
+                                {{ instance.contact_phone }}
+                                {% else %}
+                                Este cliente não contêm contacto.
+                                {% endif %}
+                            </a></td>
+                            <td><a style="color: #f90000;" href="{% url 'database:delete-client' instance.name %}">Apagar</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+        {% else %}
+            {% include "registration/goto_login.html" %}
+        {% endif %}
+
+    </main>
+    {% include "bases/footer.html" %}
+</body>
+
+</html>

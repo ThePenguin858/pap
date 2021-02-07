@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+{% load static %}
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <title>Criar Fatura</title>
+    <link rel="stylesheet" href="{% static 'form.css' %}" />
+</head>
+
+<body>
+    {% include "bases/navbar.html" %}
+    <main>
+
+        {% if user.is_authenticated %}
+        <form class="form" action="." g method="POST">{% csrf_token %}
+            <div class="form__title">Criar Cliente</div>
+            <p class="form__desc">
+            Criar uma nova entrada de fatura na base de dados.
+            </p>
+            {{ form.as_p }}
+            <p>
+            <input class="form__btn"type="Submit" value="Guardar" />
+            </p>
+        </form>
+
+        {{form.errors_as_text}}
+
+        {% else %}
+        {% include "registration/goto_login.html" %}
+        {% endif %}
+    </main>
+    {% include "bases/footer.html" %}
+</body>
+
+</html>

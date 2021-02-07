@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+{% load static %}
+<html lang="en">
+
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="{% static 'pages/projects.css' %}">
+    </head>
+
+    <body>
+        {% include 'bases/navbar.html' %}
+
+        <p class="content__title">Projetos Realizados</p>
+        <div class="divider div-transparent"></div>
+
+        <div class=" slideshow-container">
+
+            <div class="mySlides fade">
+                <div class="numbertext">1 / 7</div>
+                <img src="{% static 'images/1.jpg' %}">
+                <div class="text">Energia Solar</div>
+            </div>
+
+            <div class="mySlides fade">
+                <div class="numbertext">2 / 7</div>
+                <img src="{% static 'images/2.jpg' %}">
+                <div class="text">Remodelações</div>
+            </div>
+
+            <div class="mySlides fade">
+                <div class="numbertext">3 / 7</div>
+                <img src="{% static 'images/3.jpg' %}">
+                <div class="text">Construção</div>
+            </div>
+
+            <div class="mySlides fade">
+                <div class="numbertext">4 / 7</div>
+                <img src="{% static 'images/4.jpg' %}">
+                <div class="text">Energia Solar</div>
+            </div>
+
+            <div class="mySlides fade">
+                <div class="numbertext">5 / 7</div>
+                <img src="{% static 'images/5.jpg' %}">
+                <div class="text">AC, Ar Condicionado</div>
+            </div>
+
+            <div class="mySlides fade">
+                <div class="numbertext">6 / 7</div>
+                <img src="{% static 'images/6.jpg' %}">
+                <div class="text">Remodelações</div>
+            </div>
+
+            <div class="mySlides fade">
+                <div class="numbertext">7 / 7</div>
+                <img src="{% static 'images/7.jpg' %}">
+                <div class="text">Energia Solar</div>
+            </div>
+
+            <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+            <a class="next" onclick="plusSlides(1)">&#10095;</a>
+
+        </div>
+
+        <p class="content__title">Lista de serviços prestados</p>
+        <div class="divider div-transparent"></div>
+        <div class="main__content">
+            <div>
+                <ul class="content__list">
+                    <li>Climatização.</li>
+                    <li>Energia Solar.</li>
+                    <li>Canalizações.</li>
+                    <li>Remodelações.</li>
+                    <li>Pintura.</li>
+                    <li>Cozinhas.</li>
+                    <li>Eletricidade.</li>
+                </ul>
+            </div>
+        </div>
+
+        <script>
+            var slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+    showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+    showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+    var i;
+    var slides = document.getElementsByClassName("mySlides");
+    var dots = document.getElementsByClassName("dot");
+    if (n > slides.length) {slideIndex = 1}
+    if (n < 1) {slideIndex = slides.length}
+    for (i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+    }
+    for (i = 0; i < dots.length; i++) {
+        dots[i].className = dots[i].className.replace(" active", "");
+    }
+    slides[slideIndex - 1].style.display = "block";
+    dots[slideIndex - 1].className += " active";
+}
+        </script>
+
+        {% include 'bases/footer.html' %}
+    </body>
+</html>

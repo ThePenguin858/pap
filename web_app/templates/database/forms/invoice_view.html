@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+{% load static %}
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <title>Detalhes Fatura</title>
+    <link rel="stylesheet" href="{% static 'form.css' %}" />
+</head>
+
+<body>
+    {% include "bases/navbar.html" %}
+    <main>
+        {% if user.is_authenticated %}
+        <form method="POST" class="form"> {% csrf_token %}
+        {{ object.as_p }}
+        <input type="submit" class="form__btn" value="Guardar Fatura" />
+        </form>
+
+        {% else %}
+        {% include "registration/goto_login.html" %}
+        {% endif %}
+   </main>
+    {% include "bases/navbar.html" %}
+</body>
+
+</html>

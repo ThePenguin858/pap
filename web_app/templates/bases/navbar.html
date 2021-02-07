@@ -1,0 +1,36 @@
+{% load static %}
+
+<head>
+    <link rel="stylesheet" href="{% static 'pages/navbar.css' %}" />
+    <Title>Valter Pereira</Title>
+</head>
+<header>
+    <a href="{% url 'pages:home-view' %}">
+        <img class="logo" src="{% static 'images/logo.jpg' %}" alt="logo">
+    </a>
+    <nav class="nav_links">
+        <ul>
+            <li><a href="{% url 'pages:home-view' %}">Home</a></li>
+            <li><a href="{% url 'pages:about-view' %}">Sobre nós</a></li>
+            <li><a href="{% url 'pages:projects-view' %}">Projetos</a></li>
+            {% if user.is_authenticated %}
+            <li class="dropdown">
+                <a class="dropbtn" href="#">User</a>
+                <div class="dropdown-content">
+                    <a href="{% url 'logout' %}">Logout</a>
+                </div>
+            </li>
+            <li class="dropdown">
+                <a class="dropbtn" href="#">BaseDeDados</a>
+                <div class="dropdown-content">
+                    <a href="{% url 'database:create-client' %}">Criar Cliente</a>
+                    <a href="{% url 'database:list-clients' %}">Listar Clientes</a>
+                    <a href="{% url 'database:create-invoice' %}">Criar Fatura</a>
+                    <a href="{% url 'database:list-invoices' %}">Listar Faturas</a>
+                </div>
+            </li>
+            {% endif %}
+       </ul>
+    </nav>
+    <a class="cta" href="{% url 'pages:contact-view' %}"><button>Contacte-nos</button></a>
+</header>

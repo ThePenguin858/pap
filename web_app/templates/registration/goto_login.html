@@ -1,0 +1,12 @@
+{% load static %}
+
+<head>
+    <link rel="stylesheet" href="{% static 'goto_login.css' %}" />
+</head>
+
+<body>
+    <p>You are not logged in!</p>
+    <form method="POST" action="{% url 'login' %}">{% csrf_token %}
+        <input type="submit" value="Go to Login" />
+    </form>
+</body>

@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <title>Criar Fatura</title>
+    <link rel="stylesheet" href="{% static 'lists/lists.css' %}" />
+</head>
+
+<body>
+    {% include "bases/navbar.html" %}
+    <main>
+        {% if user.is_authenticated %}
+        <p class="content__warn">INFO: Clique no nome do cliente para editar os detalhes desse cliente.<br>
+        INFO: Clique num dos elementos da fatura para apresentar detalhes sobre essa fatura.</p>
+        <table class="content__table">
+            <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Data de Emissão</th>
+                <th>Valor do serviço</th>
+                <th>Apagar</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for instance in object_list %}
+            <tr>
+                <td>
+                    {% if instance.client %}
+                    <a href='{{ instance.client.get_absolute_url }}'>{{ instance.client.name }}</a>
+                    {% else %}
+                    O cliente foi apagado.
+                    {% endif %}
+                </td>
+                <td><a href="{{ instance.get_absolute_url }}">{{ instance.emission_date }}</a></td>
+                <td><a href="{{ instance.get_absolute_url }}">{{ instance.service_value }}</a></td>
+                <td><a style="color: #f04;" href="{% url 'database:delete-invoice' instance.fid %}">Apagar</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        {% include "registration/goto_login.html" %}
+        {% endif %}
+
+    </main>
+    {% include "bases/footer.html" %}
+</body>
+
+</html>
