@@ -1,31 +1,11 @@
-<!DOCTYPE HTML>
-{% load static %}
-<html lang="en">
-
-<head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta charset="UTF-8">
+{% extends "bases/base.html" %}
+{% block head %}
     <title>Valter Pereira</title>
-    <link rel="stylesheet" href="{% static 'pages/index.css' %}">
-</head>
-
-
-
-<body>
-
-    {% include 'bases/navbar.html' %}
-
-    <main>
-        <div class="main__content">
+{% endblock head %}
+    {% block content %}
             <div>
             <h1>Valter Pereira</h1>
             <h3>Energias Renováveis, Contrução e Canalização</h3>
             </div>
         </div>
-    </main>
-    {% include 'bases/footer.html' %}
-</body>
-
-
-</html>
+{% endblock content %}

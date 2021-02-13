@@ -1,19 +1,8 @@
-{% load static %}
-<!DOCTYPE HTML>
-<html>
-
-<head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="{% static 'pages/contact.css' %}">
-    <link rel="stylesheet" href="{% static 'form.css' %}">
-</head>
-
-<body>
-    {% include 'bases/navbar.html' %}
-
-    <main>
+{% extends "bases/base.html" %}
+{% block head %}
+<title>Listar Cliente</title>
+{% endblock head %}
+{% block content %}
         {% if message_name %}
             <br>
             <br>
@@ -43,10 +32,4 @@
                 </form>
             </div>
         </div>
-
-    </main>
-
-    {% include 'bases/footer.html' %}
-</body>
-
-</html>
+{% endblock content %}

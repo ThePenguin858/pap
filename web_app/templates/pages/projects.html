@@ -1,17 +1,9 @@
-<!DOCTYPE HTML>
+{% extends "bases/base.html" %}
 {% load static %}
-<html lang="en">
-
-    <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="{% static 'pages/projects.css' %}">
-    </head>
-
-    <body>
-        {% include 'bases/navbar.html' %}
-
+{% block head %}
+    <title>Valter Pereira</title>
+{% endblock head %}
+{% block content %}
         <p class="content__title">Projetos Realizados</p>
         <div class="divider div-transparent"></div>
 
@@ -66,7 +58,7 @@
 
         <p class="content__title">Lista de serviços prestados</p>
         <div class="divider div-transparent"></div>
-        <div class="main__content">
+        <div >
             <div>
                 <ul class="content__list">
                     <li>Climatização.</li>
@@ -109,6 +101,4 @@ function showSlides(n) {
 }
         </script>
 
-        {% include 'bases/footer.html' %}
-    </body>
-</html>
+{% endblock content %}

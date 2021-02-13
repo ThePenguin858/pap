@@ -1,22 +1,12 @@
-<!DOCTYPE html>
-{% load static %}
-
-<head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Criar Fatura</title>
-    <link rel="stylesheet" href="{% static 'content/content.css' %}" />
-</head>
-
-<body>
-    {% include 'bases/navbar.html' %}
-    <main class="content">
+{% extends "bases/base.html" %}
+{% block head %}
+<title>Listar Cliente</title>
+{% endblock head %}
+{% block content %}
         <p>Tem a certeza que deseja apagar o cliente {{ object.name }} ?"</p>
 
         <form method="POST" action="{% url 'database:delete-client' object.name %}"> {% csrf_token %}
             <a class="btn__redirect" href="{% url 'database:list-clients' %}">Não, cancelar.</a>
             <input class="btn__delete" type="submit" value="Sim, apagar">
         </form>
-    </main>
-</body>
+{% endblock content %}

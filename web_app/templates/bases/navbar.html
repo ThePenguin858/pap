@@ -1,9 +1,4 @@
 {% load static %}
-
-<head>
-    <link rel="stylesheet" href="{% static 'pages/navbar.css' %}" />
-    <Title>Valter Pereira</Title>
-</head>
 <header>
     <a href="{% url 'pages:home-view' %}">
         <img class="logo" src="{% static 'images/logo.jpg' %}" alt="logo">
@@ -13,6 +8,9 @@
             <li><a href="{% url 'pages:home-view' %}">Home</a></li>
             <li><a href="{% url 'pages:about-view' %}">Sobre nós</a></li>
             <li><a href="{% url 'pages:projects-view' %}">Projetos</a></li>
+        {% if not user.is_authenticated %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+        {% endif %}
             {% if user.is_authenticated %}
             <li class="dropdown">
                 <a class="dropbtn" href="#">User</a>

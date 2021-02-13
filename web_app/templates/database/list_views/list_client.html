@@ -1,17 +1,8 @@
-<!DOCTYPE html>
-{% load static %}
-
-<head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta charset="utf-8" />
-    <title>Listar Clientes</title> <link rel="stylesheet" href="{% static 'lists/lists.css' %}">
-
-</head>
-
-<body >
-    {% include "bases/navbar.html" %}
-    <main>
+{% extends "bases/base.html" %}
+{% block head %}
+<title>Listar Cliente</title>
+{% endblock head %}
+{% block content %}
         {% if user.is_authenticated %}
         <div class="content">
             <p class="content__warn"> INFO: Clique num dos elementos da tabela para apresentar os detalhes de cada cliente</p>
@@ -46,9 +37,4 @@
         {% else %}
             {% include "registration/goto_login.html" %}
         {% endif %}
-
-    </main>
-    {% include "bases/footer.html" %}
-</body>
-
-</html>
+{% endblock content %}

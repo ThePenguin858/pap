@@ -1,17 +1,8 @@
-<!DOCTYPE html>
-{% load static %}
-
-<head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta charset="utf-8" />
-    <title>Detalhes Cliente</title>
-    <link rel="stylesheet" href="{% static 'form.css' %}" />
-</head>
-
-<body>
-    {% include "bases/navbar.html" %}
-    <main>
+{% extends "bases/base.html" %}
+{% block head %}
+<title>Listar Cliente</title>
+{% endblock head %}
+{% block content %}
         {% if user.is_authenticated %}
         <form class="form" action="./" method="POST" > {% csrf_token %}
             {{ object.as_p }}
@@ -20,8 +11,4 @@
         {% else %}
         {% include "registration/goto_login.html" %}
         {% endif %}
-    </main>
-    {% include "bases/footer.html" %}
-</body>
-
-</html>
+{% endblock content %}

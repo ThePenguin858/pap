@@ -1,33 +1,21 @@
-<!DOCTYPE html>
-{% load static %}
+{% extends "bases/base.html" %}
+{% block head %}
+<title>Valter Pereira</title>
+{% endblock head %}
+{% block content %}
+{% if user.is_authenticated %}
+<form class="form" action="./" method="POST">{% csrf_token %}
+    <div class="form__title">Criar Cliente</div>
+    <p class="form__desc">
+        Criar uma nova entrada de cliente na base de dados.
+    </p>
 
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="{% static 'form.css' %}" />
-    <meta charset="utf-8" />
-    <title>Criar Cliente</title>
-</head>
-
-<body>
-    {% include 'bases/navbar.html' %}
-    <main>
-        {% if user.is_authenticated %}
-            <form class="form" action="./" method="POST">{% csrf_token %}
-                <div class="form__title">Criar Cliente</div>
-                <p class="form__desc">
-                Criar uma nova entrada de cliente na base de dados.
-                </p>
-
-                {{ Form.as_p }}
-                <p>
-                <input class="form__btn"type="Submit" value="Guardar" />
-                </p>
-            </form>
-        {% else %}
-            {% include "registration/goto_login.html" %}
-        {% endif %}
-    </main>
-    {% include "bases/footer.html" %}
-</body>
-
-</html>
+    {{ Form.as_p }}
+    <p>
+        <input class="form__btn"type="Submit" value="Guardar" />
+    </p>
+</form>
+{% else %}
+{% include "registration/goto_login.html" %}
+{% endif %}
+{% endblock content %}
