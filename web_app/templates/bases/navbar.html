@@ -1,34 +1,81 @@
 {% load static %}
+
+<head>
+    <link rel="stylesheet" href="{% static 'main.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" />
+    <Title>Valter Pereira</Title>
+</head>
 <header>
-    <a href="{% url 'pages:home-view' %}">
-        <img class="logo" src="{% static 'images/logo.jpg' %}" alt="logo">
-    </a>
-    <nav class="nav_links">
-        <ul>
-            <li><a href="{% url 'pages:home-view' %}">Home</a></li>
-            <li><a href="{% url 'pages:about-view' %}">Sobre nós</a></li>
-            <li><a href="{% url 'pages:projects-view' %}">Projetos</a></li>
-        {% if not user.is_authenticated %}
-            <li><a href="{% url 'login' %}">Login</a></li>
-        {% endif %}
-            {% if user.is_authenticated %}
-            <li class="dropdown">
-                <a class="dropbtn" href="#">User</a>
-                <div class="dropdown-content">
-                    <a href="{% url 'logout' %}">Logout</a>
-                </div>
-            </li>
-            <li class="dropdown">
-                <a class="dropbtn" href="#">BaseDeDados</a>
-                <div class="dropdown-content">
-                    <a href="{% url 'database:create-client' %}">Criar Cliente</a>
-                    <a href="{% url 'database:list-clients' %}">Listar Clientes</a>
-                    <a href="{% url 'database:create-invoice' %}">Criar Fatura</a>
-                    <a href="{% url 'database:list-invoices' %}">Listar Faturas</a>
-                </div>
-            </li>
-            {% endif %}
-       </ul>
+    <nav class="navbar  navbar-expand-sm navbar-dark bg-dark">
+
+        <img class="logo navbar-brand" src="{% static 'images/logo.jpg' %}" alt="logo">
+        <div class="container">
+            <ul class="navbar-nav">
+                <li class="nav-item ">
+                    <a class="nav-link" href="#">Active</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Dropdown link
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Dropdown link
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li>
+
+        </ul>
+        </div>
+
+
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
     </nav>
-    <a class="cta" href="{% url 'pages:contact-view' %}"><button>Contacte-nos</button></a>
+    <!-- <a href="{% url 'pages:home-view' %}"> -->
+        <!--     <img class="logo" src="{% static 'images/logo.jpg' %}" alt="logo"> -->
+        <!-- </a> -->
+    <!-- <nav class="nav_links"> -->
+        <!--     <ul> -->
+            <!--         <li><a href="{% url 'pages:home-view' %}">Home</a></li> -->
+            <!--         <li><a href="{% url 'pages:about-view' %}">Sobre nós</a></li> -->
+            <!--         <li><a href="{% url 'pages:projects-view' %}">Projetos</a></li> -->
+            <!--         {% if user.is_authenticated %} -->
+            <!--         <li class="dropdown"> -->
+                <!--             <a class="dropbtn" href="#">User</a> -->
+                <!--             <div class="dropdown-content"> -->
+                    <!--                 <a href="{% url 'logout' %}">Logout</a> -->
+                    <!--             </div> -->
+                <!--         </li> -->
+            <!--         <li class="dropdown"> -->
+                <!--             <a class="dropbtn" href="#">BaseDeDados</a> -->
+                <!--             <div class="dropdown-content"> -->
+                    <!--                 <a href="{% url 'database:create-client' %}">Criar Cliente</a> -->
+                    <!--                 <a href="{% url 'database:list-clients' %}">Listar Clientes</a> -->
+                    <!--                 <a href="{% url 'database:create-invoice' %}">Criar Fatura</a> -->
+                    <!--                 <a href="{% url 'database:list-invoices' %}">Listar Faturas</a> -->
+                    <!--             </div> -->
+                <!--         </li> -->
+            <!--         {% endif %} -->
+            <!--    </ul> -->
+        <!-- </nav> -->
+    <!-- <a class="cta" href="{% url 'pages:contact-view' %}"><button>Contacte-nos</button></a> -->
 </header>
