@@ -8,18 +8,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{% static 'main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     {% block head %}{% endblock head %}
 </head>
 
     {% include 'bases/navbar.html' %}
+
+
 <body>
 
-    <main class="main__content">
-
     {% block content %}{% endblock content %}
-    </main>
 
 </body>
-
-    {% include 'bases/footer.html' %}
 </html>

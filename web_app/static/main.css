@@ -7,10 +7,6 @@
     margin: 0;
 }
 
-body {
-    display: flex;
-    flex-direction: column;
-}
 
 .main__content {
     width: 100%;
@@ -768,3 +764,6 @@ textarea {
     background: #0fa942;
 }
 
+.bg-grey {
+    background-color: #afafafa;
+}
