@@ -866,3 +866,7 @@ textarea {
         display:none; !important
     }
 }
+
+.rotate-image {
+    transform: rotate(180deg);
+}
