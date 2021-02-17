@@ -130,6 +130,10 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static/'),
 )
 
+MEDIA_URL = '/images/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images/')
+
 # env = environ.Env()
 # # reading .env file
 # environ.Env.read_env()

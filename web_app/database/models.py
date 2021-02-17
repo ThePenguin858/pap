@@ -1,33 +1,61 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.urls import reverse
 
 # Create your models here.
 
 
-class Client(models.Model):
-    name = models.CharField(primary_key=True, unique=True, max_length=120)
-    nif = models.CharField(max_length=9, unique=True)
-    address = models.CharField(max_length=500, blank=True)
-    zip_code = models.CharField(max_length=16)
-    contact_email = models.EmailField()
-    contact_phone = models.CharField(max_length=13, blank=True)
+class Customer(models.Model):
+    user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200, null=True)
+    email = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
 
     def get_absolute_url(self):
         return reverse('database:client-detail', kwargs={'my_name': self.name})
 
+class Product(models.Model):
+    name = models.CharField(max_length=200)
+    price = models.FloatField()
+    digital = models.BooleanField(default=False, null=True, blank=True)
+    image = models.ImageField(null=True, blank=True)
 
-class Invoice(models.Model):
-    fid = models.AutoField(unique=True, primary_key=True)
-    client = models.ForeignKey(
-        Client, on_delete=models.SET_NULL, null=True)
-    provider_name = models.CharField(max_length=120)
-    provider_nif = models.DecimalField(max_digits=9, decimal_places=0)
-    service_value = models.PositiveIntegerField()
-    emission_date = models.DateField()
-    iva = models.DecimalField(blank=True, null=True,
-                              decimal_places=2, max_digits=10)
-    tax_explanation = models.TextField(blank=True, null=True)
-    service_date = models.DateField(blank=True, null=True)
+    @property
+    def imageURL(self):
+        try:
+            url = self.image.url
+        except:
+            url=""
+        return url
 
-    def get_absolute_url(self):
-        return reverse('database:invoice-detail', kwargs={'fid': self.fid})
+
+    def __str__(self):
+        return self.name
+
+class Order(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
+    date_ordered = models.DateTimeField(auto_now_add=True)
+    complete = models.BooleanField(default=False)
+    transaction_id = models.CharField(max_length=100, null=True)
+
+    def __str__(self):
+        return str(self.id)
+
+class OrderItem(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    quantity = models.IntegerField(default=9, null=True, blank=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+class ShippingAddress(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, blank=True, null=True)
+    address = models.CharField(max_length=200, null=True)
+    city = models.CharField(max_length=200, null=True)
+    zip_code = models.CharField(max_length=200, null=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.address
