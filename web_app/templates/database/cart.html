@@ -2,6 +2,7 @@
 {% load static %}
 {% block title %} Carrinho {% endblock title %}
 {% block head %}
+<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
 {% endblock head %}
 {% block content %}
 <div class="container pt-5">
@@ -40,9 +41,9 @@
                     <div style="flex:1">
                         <p class="quantity">{{item.quantity}}</p>
                         <div class="quantity">
-                            <img class="chg-quantity" src="{% static  'images/arrow_up.png' %}">
+                            <img class="chg-quantity update-cart" data-attribute="{{item.id}}" data-action="add" src="{% static  'images/arrow_up.png' %}">
 
-                            <img class="chg-quantity rotate-image" src="{% static  'images/arrow_up.png' %}">
+                            <img class="chg-quantity rotate-image update-cart" data-attribute="{{item.id}}" data-action="rem"  src="{% static  'images/arrow_up.png' %}">
                         </div>
                     </div>
                     <div style="flex:1"><p>{{item.get_total|floatformat:2}}</p></div>

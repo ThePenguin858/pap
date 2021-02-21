@@ -19,7 +19,7 @@ Checkout
                             <input required class="form-control" type="email" name="email" placeholder="Email..">
                         </div>
                     </div>
-
+                    {% if order.shipping %}
                     <div id="shipping-info">
                         <hr>
                         <p>Shipping Information:</p>
@@ -37,6 +37,7 @@ Checkout
                             <input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
                         </div>
                     </div>
+                    {% endif %}
                     <hr>
                     <input id="form-button" class="btn btn-success btn-block" type="submit" value="Continue">
                 </form>
