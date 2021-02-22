@@ -1,7 +1,9 @@
 from django.urls import path
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-from database.views import (store_view, cart_view, checkout_view, update_item_view)
+from database.views import (store_view, cart_view,
+                            checkout_view, update_item_view,
+                            process_order_view)
 
 app_name = 'database'
 urlpatterns = [
@@ -11,6 +13,7 @@ urlpatterns = [
     path('cart/', cart_view, name='cart'),
     path('checkout/', checkout_view, name='checkout'),
     path('update_item/', update_item_view, name='update_item'),
+    path('process_order/', process_order_view, name='process_order'),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

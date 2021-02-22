@@ -10,7 +10,8 @@ Checkout
     <div class="row">
         <div class="col-lg-6">
             <div class="box-element" id="form-wrapper">
-                <form id="form">
+                <form id="form">{% csrf_token %}
+                    {% if not user.is_authenticated  %}
                     <div id="user-info">
                         <div class="form-field">
                             <input required class="form-control" type="text" name="name" placeholder="Name..">
@@ -19,6 +20,7 @@ Checkout
                             <input required class="form-control" type="email" name="email" placeholder="Email..">
                         </div>
                     </div>
+                    {% endif %}
                     {% if order.shipping %}
                     <div id="shipping-info">
                         <hr>
@@ -29,9 +31,6 @@ Checkout
                         </div>
                         <div class="form-field">
                             <input class="form-control" type="text" name="city" placeholder="City..">
-                        </div>
-                        <div class="form-field">
-                            <input class="form-control" type="text" name="state" placeholder="State..">
                         </div>
                         <div class="form-field">
                             <input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
@@ -53,10 +52,12 @@ Checkout
                 <hr>
                 {% for item in items %}
                 <div class="cart-row">
+                    <!-- These flex styles change the behaviour of the page on changing, the bigger it is
+                         the bigger it will be when it shrinks -->
                     <div style="flex:2"><img class="row-image" src="{{item.product.imageURL}}"></div>
                     <div style="flex:2"><p>{{item.product.name}}</p></div>
                     <div style="flex:1"><p>{{item.product.price|floatformat:2}}</p></div>
-                    <div style="flex:1"> <p class="quantity">x{{item.quantity}}</p> </div>
+                    <div style="flex:1"><p class="quantity">x{{item.quantity}}</p> </div>
                 </div>
                 {% endfor %}
                 <h5>Items:  {{order.get_cart_items}} </h5>
@@ -67,6 +68,77 @@ Checkout
     <br>
     <div class="box-element hidden" id="payment-info">
         <small>Paypal Options</small>
+        <button id="make-payment">
+
+        </button>
     </div>
 </div>
+
+<script type="text/javascript">
+ var total = "{{order.get_cart_total}}"
+ var shipping = "{{order.shipping}}"
+
+ var form = document.getElementById('form')
+ form.addEventListener('submit', function(e){
+
+     // This is to block the button to do it's default stuff aka request post
+     e.preventDefault()
+
+     console.log('Form Submitted...')
+
+     // Changes the css classes of these elements to add or remove hidden property
+     document.getElementById('form-button').classList.add("hidden")
+     document.getElementById('payment-info').classList.remove("hidden")
+
+     document.getElementById('make-payment').addEventListener('click', function(e){
+         submitFormData()})
+     function submitFormData(){
+         console.log('Payment button clicked')
+
+         var user = "{{request.user}}"
+         var userFormData = {
+             'name': null,
+             'email':null,
+             'total': total
+         }
+         var shippingInfo = {
+             'address': null,
+             'city': null,
+             'zipcode':null
+         }
+         if(shipping != 'False'){
+             shippingInfo.address = form.address.value
+             shippingInfo.city = form.city.value
+             shippingInfo.zipcode = form.zipcode.value
+         }
+
+         if(user == "AnonymousUser") {
+             userFormData.name = form.name.value
+             userFormData.email = form.email.value
+         }
+    var url = '/database/process_order/'
+
+     fetch(url, {
+         method: 'POST', headers: {
+             'Content-Type':'application/json',
+             'X-CSRFToken': csrftoken,
+         },
+         body: JSON.stringify({
+             'form': userFormData,
+             'shipping': shippingInfo
+     })})
+     // When the asynchronous call above completes, these guys are called only once
+         .then((response) => {
+             return response.json()
+         })
+     // This only gets called if the above response is executed
+         .then((data) => {
+             console.log('Success:', data)
+             window.location.href = "{% url 'database:store' %}"
+         })
+
+ }
+ })
+</script>
+
 {% endblock content %}

@@ -1,8 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 import json
+import datetime
 
-from database.models import Product, Order, OrderItem
+from database.models import Product, Order, OrderItem, ShippingAddress
 # from .forms import EditClientForm, ClientForm, InvoiceForm
 # Create your views here.
 
@@ -48,7 +49,7 @@ def store_view(request):
 
 
     context = {
-        'items': items,
+        'products': queryset,
         'order': order,
         'cartItems': cartItems
     }
@@ -72,7 +73,7 @@ def cart_view(request):
 
 
     context = {
-        'items': items,
+        'products': items,
         'order': order,
         'cartItems': cartItems
     }
@@ -101,3 +102,28 @@ def checkout_view(request):
         'cartItems': cartItems
     }
     return render(request, 'database/checkout.html', context)
+
+def process_order_view(request):
+    transaction_id = datetime.datetime.now().timestamp()
+    data = json.loads(request.body)
+
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        total = float(data['form']['total'])
+        order.transaction_id = transaction_id
+
+    if total == order.get_cart_total:
+        order.complete = True
+    order.save()
+
+    if order.shipping == True:
+        ShippingAddress.objects.create(
+            customer=customer,
+            order=order,
+            address = data['shipping']['address'],
+            city = data['shipping']['city'],
+            zip_code = data['shipping']['zipcode'],
+        )
+
+    return JsonResponse('Payment complete', safe=False);
