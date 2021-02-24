@@ -35,6 +35,9 @@ Checkout
                         <div class="form-field">
                             <input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
                         </div>
+                        <div class="form-field">
+                            <input class="form-control" type="text" name="country" placeholder="Country..">
+                        </div>
                     </div>
                     {% endif %}
                     <hr>
@@ -104,12 +107,14 @@ Checkout
          var shippingInfo = {
              'address': null,
              'city': null,
-             'zipcode':null
+             'zipcode':null,
+             'country':null
          }
          if(shipping != 'False'){
              shippingInfo.address = form.address.value
              shippingInfo.city = form.city.value
              shippingInfo.zipcode = form.zipcode.value
+             shippingInfo.country = form.country.value
          }
 
          if(user == "AnonymousUser") {

@@ -121,9 +121,10 @@ def process_order_view(request):
         ShippingAddress.objects.create(
             customer=customer,
             order=order,
-            address = data['shipping']['address'],
-            city = data['shipping']['city'],
-            zip_code = data['shipping']['zipcode'],
+            address=data['shipping']['address'],
+            city=data['shipping']['city'],
+            zip_code=data['shipping']['zipcode'],
+            country=data['shipping']['country'],
         )
 
-    return JsonResponse('Payment complete', safe=False);
+    return JsonResponse('Payment complete', safe=False)
