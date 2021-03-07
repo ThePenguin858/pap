@@ -76,6 +76,7 @@ class OrderItem(models.Model):
         "Gets the total price of a cart item, according to its price and quantity"
         return self.product.price * self.quantity
 
+
 class ShippingAddress(models.Model):
     "Represents a shipping adress of a user and a order"
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
