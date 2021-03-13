@@ -56,6 +56,7 @@ def store_view(request):
     return render(request, 'database/store.html', context)
 
 def cart_view(request):
+    "This view delivers all of the products to be rendered on the page"
 
     if request.user.is_authenticated:
         customer = request.user.customer

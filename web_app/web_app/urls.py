@@ -22,7 +22,6 @@ urlpatterns = [
 
     # Back end and Database urls
     path('database/', include('database.urls')),
-    path('game/', include('chess_game.urls')),
     path('', include('django.contrib.auth.urls')),
     # Front end
     path('', include('pages.urls')),
