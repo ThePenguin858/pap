@@ -6,4 +6,4 @@ def board_view(request):
     context = {
         "board": 1
     }
-    return render(request, 'game/board.html', context)
+    return render(request, 'chess_game/board.html', context)
