@@ -1,11 +1,18 @@
+
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "noImplicitAny": true,
-        "removeComments": true,
-        "preserveConstEnums": true,
-        "sourceMap": true,
-        "outDir": "build"
-    },
-    "include": ["src/**/*"],
+  "compilerOptions": {
+    "target": "es5",
+    "module": "none",
+    "sourceMap": true,
+    "allowJs": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "lib": [
+      "es5",
+        "dom",
+      "scripthost"
+    ]
+  }
 }

@@ -1,0 +1,19 @@
+{
+  "name": "engine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webpack.config.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "phaser": "^3.53.1",
+    "ts-loader": "^8.0.18",
+    "typescript": "^4.2.3"
+  }
+}
