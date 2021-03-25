@@ -1,2 +1,4 @@
 /.projectile
 .git-credentials
+secret.py
+***/docs
