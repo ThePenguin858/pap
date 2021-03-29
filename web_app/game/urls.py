@@ -1,7 +1,7 @@
 
 from django.urls import include, path
 
-from .views import board_view
+from game.views import board_view
 
 app_name = "game"
 urlpatterns = [
