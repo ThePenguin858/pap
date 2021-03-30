@@ -8,7 +8,6 @@ export class BoardScene extends Phaser.Scene {
     };
 
     preload() {
-        console.log("Preload");
         this.load.image("white_pawn", "/static/images/pieces/white_pawn.png");
         this.load.image("white_bishop", "/static/images/pieces/white_bishop.png");
         this.load.image("white_king", "/static/images/pieces/white_king.png");

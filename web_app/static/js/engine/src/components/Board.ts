@@ -1,4 +1,5 @@
 import * as chessUtils from '../utils/chess'
+import { game as Game } from '../app'
 import * as PieceComponent from '../components/Piece'
 import * as Phaser from 'phaser'
 
@@ -104,13 +105,19 @@ export class Board {
                             url = "black_pawn";
                             break;
                     }
+
                     let sprite = this.Scene.add.sprite(position.x, position.y, url);
                     sprite.scale = 0.3;
                     sprite.setInteractive();
                     this.Scene.input.setDraggable(sprite);
                     sprite.addListener("drag", (pointer: any, dragX: number, dragY: number) => {
                         sprite.setPosition(pointer.x, pointer.y);
+                        sprite.setDepth(1);
                     });
+                    sprite.addListener("dragend", (pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject, target: Phaser.GameObjects.GameObject) => {
+
+                        sprite.setDepth(0);
+                    })
                 }
                 position.x += 100;
             }
