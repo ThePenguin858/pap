@@ -2,7 +2,7 @@ import {Board as Board} from '../components/Board';
 
 
 export class BoardScene extends Phaser.Scene {
-    private myBoard = new Board(this)
+    private myBoard = new Board(this, "3qk2r/pp1p1ppp/2bP4/1B1BPp2/2P1p1b1/1n1nrK2/P1PP2PP/RN1Q2NR")
     constructor(sceneConfig: Phaser.Types.Scenes.SettingsConfig){
         super(sceneConfig);
     };
