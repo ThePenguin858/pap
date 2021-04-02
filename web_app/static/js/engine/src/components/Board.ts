@@ -107,7 +107,6 @@ export class Board {
 
     drawGraphicalBoard() {
         this.processFEN();
-        console.log(this.pieces);
         let position: Phaser.Math.Vector2 = new Phaser.Math.Vector2(50, 50);
         let squareWidth = 100;
 
@@ -125,6 +124,7 @@ export class Board {
             position.x = 50;
             position.y += 100;
         }
+
         position.x = 50;
         position.y = 50;
         for (let rank: number = 0; rank < 8; rank++) {
@@ -173,16 +173,23 @@ export class Board {
                 if(pieceType > 0){
                     let sprite = this.Scene.add.sprite(position.x, position.y, url);
                     sprite.scale = 0.3;
+
                     sprite.setInteractive();
                     this.Scene.input.setDraggable(sprite);
-                    sprite.addListener("drag", (pointer: any, dragX: number, dragY: number) => {
-                        sprite.setPosition(pointer.x, pointer.y);
-                        // sprite.setDepth(1);
-                    });
-                    sprite.addListener("dragend", (pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject, target: Phaser.GameObjects.GameObject) => {
 
-                        // sprite.setDepth(0);
+                    sprite.addListener("drag", (pointer: any, dragX: number, dragY: number) => {
+                        if(dragX < 800 && dragY < 800)
+                            sprite.setPosition(pointer.x, pointer.y);
+                        sprite.setDepth(1);
                     });
+
+                    sprite.addListener("dragend", (pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject, target: Phaser.GameObjects.GameObject) => {
+                        sprite.setX(Math.floor(sprite.x / 100) * 100 + 50);
+                        sprite.setY(Math.floor(sprite.y / 100) * 100 + 50);
+                        sprite.setDepth(0);
+                    });
+
+
                 }
                 position.x += 100;
             }

@@ -25,5 +25,6 @@ export class BoardScene extends Phaser.Scene {
     create() {
         //Create Chess board
         this.myBoard.drawGraphicalBoard();
+        this.add.grid(0,0,8,8,100,100,0xff0000);
     }
 };
