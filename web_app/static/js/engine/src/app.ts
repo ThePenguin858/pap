@@ -2,10 +2,9 @@ import * as Phaser from 'phaser';
 import * as GameScenes from './scenes/BoardScene';
 
 let BoardScene = new GameScenes.BoardScene({
-    key: "begin",
+    key: "active_board",
     active: true,
     visible: true,
-
 })
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -21,6 +20,9 @@ const config: Phaser.Types.Core.GameConfig = {
         arcade: {
             gravity: { y: 0 }
         },
+    },
+    audio: {
+        disableWebAudio: true
     },
     scene: [BoardScene],
 }

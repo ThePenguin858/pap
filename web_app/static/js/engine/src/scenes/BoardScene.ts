@@ -27,4 +27,7 @@ export class BoardScene extends Phaser.Scene {
         this.myBoard.drawGraphicalBoard();
     }
 
+    update() {
+    }
+
 };

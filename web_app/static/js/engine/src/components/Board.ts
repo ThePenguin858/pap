@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser'
+import * as Move from './Move'
 import { CST, COLORS } from './CST'
-import { Move } from './Move'
 
 function ROW(x: number): number {
     return x >> 3;
@@ -29,6 +29,7 @@ export class Board {
 
     constructor(Scene: Phaser.Scene, FEN: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR") {
         this.Scene = Scene;
+
         this.pieces = [];
         this.colors = [];
         this.FEN = FEN;
@@ -49,7 +50,7 @@ export class Board {
             6, 6, 6, 6, 6, 6, 6, 6,
             6, 6, 6, 6, 6, 6, 6, 6,
             0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0
+            1, 1, 0, 0, 0, 0, 0, 0
         ];
 
         this.pieces = [
@@ -182,7 +183,7 @@ export class Board {
                             url = "black_pawn";
                             break;
                         case CST.KNIGHT:
-                            url = "black_king";
+                            url = "black_knight";
                             break;
                         case CST.BISHOP:
                             url = "black_bishop";
@@ -203,7 +204,7 @@ export class Board {
                             url = "white_pawn";
                             break;
                         case CST.KNIGHT:
-                            url = "white_king";
+                            url = "white_knight";
                             break;
                         case CST.BISHOP:
                             url = "white_bishop";
@@ -219,66 +220,79 @@ export class Board {
                             break;
                     }
                 }
-                let sprite: Phaser.Physics.Arcade.Sprite = this.Scene.physics.add.sprite(position.x, position.y, url);
-                console.log("It is a piece i:" + i );
-                console.log(" piece:" + this.pieces[i]);
+                let sprite = this.Scene.physics.add.sprite(position.x, position.y, url);
                 let file = Math.floor((sprite.x - 50) / 100);
                 let rank = Math.floor((sprite.y - 50) / 100);
 
                 sprite.scale = 0.3;
+                sprite.setBodySize(150, 150);
 
                 sprite.setInteractive();
                 this.Scene.input.setDraggable(sprite);
 
-                // sprite.addListener("dragstart", (pointer: any, dragX: number, dragY: number) => {
-                //     if(this.pieces)
-                //         if(dragX < 800 && dragY < 800){
-                //             file = Math.floor((sprite.x - 50) / 100);
-                //             rank = Math.floor((sprite.y - 50) / 100);
-                //         }
-                // });
-                // sprite.addListener("drag", (pointer: any, dragX: number, dragY: number) => {
-                //     if(this.pieces)
-                //         if(dragX < 800 && dragY < 800){
-                //             sprite.setPosition(pointer.x, pointer.y);
-                //         }
-                //     sprite.setDepth(1);
-                // });
 
-                // sprite.addListener("dragend", (pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject, target: Phaser.GameObjects.GameObject) => {
-                //     if(sprite.x > 0 && sprite.x < 800 && sprite.y > 0 && sprite.y < 800) {
-                //         let endfile = Math.floor((pointer.x - 50) / 100);
-                //         let endrank = Math.floor((pointer.y - 50) / 100);
-                //         sprite.setX(Math.floor(sprite.x / 100) * 100 + 50);
-                //         sprite.setY(Math.floor(sprite.y / 100) * 100 + 50);
-                //         sprite.setDepth(0);
 
-                //         let piece = this.pieces[8 * rank + file];
-                //         this.pieces[8 * rank + file].pieceType = pieces.none;
-                //         this.pieces[8 * endrank + endfile] = piece;
-                //         // console.log(piece);
-                //         // console.log(this.pieces[8 * endrank + endfile]);
-                //         // console.log(this.pieces[8 * rank + file]);
-                //     }
-                    
-                // });
+                /* This piece of code is to handle the drag input of the pieces and translate
+                 * it into the mailbox board representation */
+                
+                sprite.addListener("dragstart", (pointer: any, dragX: number, dragY: number) => {
+                    if(dragX < 800 && dragY < 800){
+                        file = Math.floor((sprite.x - 50) / 100);
+                        rank = Math.floor((sprite.y - 50) / 100);
+                        console.log("File: " + file + " rank: " + rank);
+                    }
+                });
+                sprite.addListener("drag", (pointer: any, dragX: number, dragY: number) => {
+                    if(dragX < 800 && dragY < 800){
+                        sprite.setPosition(pointer.x, pointer.y);
+                    }
+                });
 
+                sprite.addListener("dragend", (pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject, target: Phaser.GameObjects.GameObject) => {
+                    if(sprite.x > 0 && sprite.x < 800 && sprite.y > 0 && sprite.y < 800) {
+                        sprite.setX(Math.floor(sprite.x / 100) * 100 + 50);
+                        sprite.setY(Math.floor(sprite.y / 100) * 100 + 50);
+                        file = Math.floor((sprite.x - 50) / 100);
+                        rank = Math.floor((sprite.y - 50) / 100);
+                        //If collision is true, delete the sprite and set the value on the mailbox to the new piece
+                        let indexToDestroy = this.checkForCollisions(sprite);
+                        // if(indexToDestroy > -1)
+                        //     sprite.destroy();
+                    }
+                });
                 this.pieceSprites.push(sprite);
+
             } else {
                 //PIECE is not present in current square
             }
-                position.x += 100;
+            position.x += 100;
             if((i+1) % 8) {
             } else {
                 position.x = 50;
                 position.y += 100;
-                
             }
-        }
-}
+       }
+    }
 
-makeMove() {
-    
-}
+    checkForCollisions(sprite1: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody): number {
+        this.pieceSprites.forEach((sprite2) => {
+                if(this.Scene.physics.overlap(sprite1, sprite2)){
+                    let index = this.pieceSprites.indexOf(sprite2, 0);
+                    delete this.pieceSprites[index];
+                    console.log("sprite 1 two pieces collided");
+                    sprite2.destroy();
+                    sprite1.setTint(0x00ff00);
+                    return 1;
+                }else {
+                    sprite1.setDepth(0);
+                }
+        });
+        return -1;
+
+    };
+
+    makeMove() {
+        
+    }
 
 };
