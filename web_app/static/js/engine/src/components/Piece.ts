@@ -1,14 +1,17 @@
 import * as Phaser from 'phaser';
-export enum pieces {
-    none,
-    king,
-    queen,
-    rook,
-    bishop,
-    knight,
-    pawn,
 
-    //Bit 7, represents if the color of the piece
-    black = 8,
-    white = 16
-};
+
+class Piece {
+    pieceType: number;
+
+    constructor(pieceType: number) {
+        this.pieceType = pieceType;
+    }
+
+    //Returns true if piece is black
+    // isPieceBlack(): boolean {
+    //     if(this.pieceType < pieces.white && this.pieceType > 0)
+    //         return true;
+    //     return false;
+    // }
+}

@@ -1,31 +1,68 @@
 import * as Phaser from 'phaser'
+import { CST, COLORS } from './CST'
+import { Move } from './Move'
 
-enum pieces {
-    none,
-    king,
-    queen,
-    rook,
-    bishop,
-    knight,
-    pawn,
+function ROW(x: number): number {
+    return x >> 3;
+}
 
-    //Bit 7, represents if the color of the piece
-    black = 8,
-    white = 16
-};
-
+function COL(x: number): number {
+    return x & 7;
+}
 export class Board {
 
-    private Scene: Phaser.Scene;
     private pieces: number[];
-    private colorToMove: pieces;
+    private colors: number[];
+    private offset: number[][];
+
+    private side: COLORS = COLORS.WHITE;
+    private xside: number = COLORS.BLACK;
+    private fifty: number = 0;
+    private hash: number = 0;
+    private ply: number = 0;
+    private hply: number = 0;
+
     private FEN: string
+
+    private pieceSprites: Phaser.Physics.Arcade.Sprite[];
+    private Scene: Phaser.Scene;
 
     constructor(Scene: Phaser.Scene, FEN: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR") {
         this.Scene = Scene;
         this.pieces = [];
-        this.colorToMove = pieces.white;
+        this.colors = [];
         this.FEN = FEN;
+        this.offset = [
+            [ 0, 0, 0, 0, 0, 0, 0, 0 ], //Pawn offsets
+            [ -21, -19, -12, -8, 8, 12, 19, 21 ], // Knight 
+            [ -11, -9, 9, 11, 0, 0, 0, 0 ], //Bishop
+            [ -10, -1, 1, 10, 0, 0, 0, 0 ], //Rook
+            [ -11, -10, -9, -1, 1, 9, 10, 11 ], //Queen
+            [ -11, -10, -9, -1, 1, 9, 10, 11 ] //King
+        ];
+
+        this.colors = [
+            1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1,
+            6, 6, 6, 6, 6, 6, 6, 6,
+            6, 6, 6, 6, 6, 6, 6, 6,
+            6, 6, 6, 6, 6, 6, 6, 6,
+            6, 6, 6, 6, 6, 6, 6, 6,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0
+        ];
+
+        this.pieces = [
+            3, 1, 2, 4, 5, 2, 1, 3,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            6, 6, 6, 6, 6, 6, 6, 6,
+            6, 6, 6, 6, 6, 6, 6, 6,
+            6, 6, 6, 6, 6, 6, 6, 6,
+            6, 6, 6, 6, 6, 6, 6, 6,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            3, 1, 2, 4, 5, 2, 1, 3
+        ];
+        this.pieceSprites = [];
     }
     // Starts at the 22 index, ends in the 86 index
     private mailbox: number[] = [
@@ -42,66 +79,75 @@ export class Board {
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
     ];
+    private mailbox64: number[] = [
+        21, 22, 23, 24, 25, 26, 27, 28,
+        31, 32, 33, 34, 35, 36, 37, 38,
+        41, 42, 43, 44, 45, 46, 47, 48,
+        51, 52, 53, 54, 55, 56, 57, 58,
+        61, 62, 63, 64, 65, 66, 67, 68,
+        71, 72, 73, 74, 75, 76, 77, 78,
+        81, 82, 83, 84, 85, 86, 87, 88,
+        91, 92, 93, 94, 95, 96, 97, 98
+    ];
 
     processFEN() {
-        let boardIndexCounter: number = 0;
-        // Accesses the correct valid mailbox index without having to manually increment
-        const accessPieces = (piece: number) => {
-            this.pieces[boardIndexCounter] = piece;
-            boardIndexCounter++;
-        };
+        // let boardIndexCounter: number = 0;
+        // // Accesses the correct valid mailbox index without having to manually increment
+        // const accessPieces = (piece: number) => {
+        //     this.pieces.push(piece);
+        // };
 
-        for(let i: number = 0; i < this.FEN.length; i++){
+        // for(let i: number = 0; i < this.FEN.length; i++){
 
-            const char = this.FEN.charAt(i);
+        //     const char = this.FEN.charAt(i);
 
-            if (parseInt(char)) {
-                for(let j: number = 0; j < parseInt(char); j++){
-                    accessPieces(pieces.none);
-                }
-            } else {
-                switch(char){
-                    case "/":
-                        break
-                    case "k":
-                        accessPieces(pieces.black | pieces.king);
-                        break;
-                    case "q":
-                        accessPieces(pieces.black | pieces.queen);
-                        break;
-                    case "n":
-                        accessPieces(pieces.black | pieces.knight);
-                        break;
-                    case "p":
-                        accessPieces(pieces.black | pieces.pawn);
-                        break;
-                    case "b":
-                        accessPieces(pieces.black | pieces.bishop);
-                        break;
-                    case "r":
-                        accessPieces(pieces.black | pieces.rook);
-                        break;
-                    case "K":
-                        accessPieces(pieces.white | pieces.king);
-                        break;
-                    case "Q":
-                        accessPieces(pieces.white | pieces.queen);
-                        break;
-                    case "N":
-                        accessPieces(pieces.white | pieces.knight);
-                        break;
-                    case "P":
-                        accessPieces(pieces.white | pieces.pawn);
-                        break;
-                    case "B":
-                        accessPieces(pieces.white | pieces.bishop);
-                        break;
-                    case "R":
-                        accessPieces(pieces.white | pieces.rook);
-                        break;
-                }
-            }
-        }
+        //     if (parseInt(char)) {
+        //         for(let j: number = 0; j < parseInt(char); j++){
+        //             accessPieces(pieces.none);
+        //         }
+        //     } else {
+        //         switch(char){
+        //             case "/":
+        //                 break
+        //             case "k":
+        //                 accessPieces(pieces.black | pieces.king);
+        //                 break;
+        //             case "q":
+        //                 accessPieces(pieces.black | pieces.queen);
+        //                 break;
+        //             case "n":
+        //                 accessPieces(pieces.black | pieces.knight);
+        //                 break;
+        //             case "p":
+        //                 accessPieces(pieces.black | pieces.pawn);
+        //                 break;
+        //             case "b":
+        //                 accessPieces(pieces.black | pieces.bishop);
+        //                 break;
+        //             case "r":
+        //                 accessPieces(pieces.black | pieces.rook);
+        //                 break;
+        //             case "K":
+        //                 accessPieces(pieces.white | pieces.king);
+        //                 break;
+        //             case "Q":
+        //                 accessPieces(pieces.white | pieces.queen);
+        //                 break;
+        //             case "N":
+        //                 accessPieces(pieces.white | pieces.knight);
+        //                 break;
+        //             case "P":
+        //                 accessPieces(pieces.white | pieces.pawn);
+        //                 break;
+        //             case "B":
+        //                 accessPieces(pieces.white | pieces.bishop);
+        //                 break;
+        //             case "R":
+        //                 accessPieces(pieces.white | pieces.rook);
+        //                 break;
+        //         }
+        //     }
+        // }
     }
 
 
@@ -127,75 +173,112 @@ export class Board {
 
         position.x = 50;
         position.y = 50;
-        for (let rank: number = 0; rank < 8; rank++) {
-            for (let file: number = 0; file < 8; file++) {
-                let pieceType: number = this.pieces[8 * rank + file];
-                let url: string = "";
-                switch (pieceType) {
-                    case pieces.white | pieces.king:
-                        url = "white_king";
-                        break;
-                    case pieces.white | pieces.queen:
-                        url = "white_queen";
-                        break;
-                    case pieces.white | pieces.rook:
-                        url = "white_rook";
-                        break;
-                    case pieces.white | pieces.bishop:
-                        url = "white_bishop";
-                        break;
-                    case pieces.white | pieces.knight:
-                        url = "white_knight";
-                        break;
-                    case pieces.white | pieces.pawn:
-                        url = "white_pawn";
-                        break;
-
-                    case pieces.black | pieces.king:
-                        url = "black_king";
-                        break;
-                    case pieces.black | pieces.queen:
-                        url = "black_queen";
-                        break;
-                    case pieces.black | pieces.rook:
-                        url = "black_rook";
-                        break;
-                    case pieces.black | pieces.bishop:
-                        url = "black_bishop";
-                        break;
-                    case pieces.black | pieces.knight:
-                        url = "black_knight";
-                        break;
-                    case pieces.black | pieces.pawn:
-                        url = "black_pawn";
-                        break;
+        for (let i = 0; i < 64; i++) {
+            let url: string = "";
+            if(this.colors[i] != CST.EMPTY){
+                if(this.colors[i]) { // BLACK Pieces
+                    switch(this.pieces[i]){
+                        case CST.PAWN:
+                            url = "black_pawn";
+                            break;
+                        case CST.KNIGHT:
+                            url = "black_king";
+                            break;
+                        case CST.BISHOP:
+                            url = "black_bishop";
+                            break;
+                        case CST.ROOK:
+                            url = "black_rook";
+                            break;
+                        case CST.QUEEN:
+                            url = "black_queen";
+                            break;
+                        case CST.KING:
+                            url = "black_king";
+                            break;
+                    }
+                } else { // WHITE Pieces
+                    switch(this.pieces[i]){
+                        case CST.PAWN:
+                            url = "white_pawn";
+                            break;
+                        case CST.KNIGHT:
+                            url = "white_king";
+                            break;
+                        case CST.BISHOP:
+                            url = "white_bishop";
+                            break;
+                        case CST.ROOK:
+                            url = "white_rook";
+                            break;
+                        case CST.QUEEN:
+                            url = "white_queen";
+                            break;
+                        case CST.KING:
+                            url = "white_king";
+                            break;
+                    }
                 }
-                if(pieceType > 0){
-                    let sprite = this.Scene.add.sprite(position.x, position.y, url);
-                    sprite.scale = 0.3;
+                let sprite: Phaser.Physics.Arcade.Sprite = this.Scene.physics.add.sprite(position.x, position.y, url);
+                console.log("It is a piece i:" + i );
+                console.log(" piece:" + this.pieces[i]);
+                let file = Math.floor((sprite.x - 50) / 100);
+                let rank = Math.floor((sprite.y - 50) / 100);
 
-                    sprite.setInteractive();
-                    this.Scene.input.setDraggable(sprite);
+                sprite.scale = 0.3;
 
-                    sprite.addListener("drag", (pointer: any, dragX: number, dragY: number) => {
-                        if(dragX < 800 && dragY < 800)
-                            sprite.setPosition(pointer.x, pointer.y);
-                        sprite.setDepth(1);
-                    });
+                sprite.setInteractive();
+                this.Scene.input.setDraggable(sprite);
 
-                    sprite.addListener("dragend", (pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject, target: Phaser.GameObjects.GameObject) => {
-                        sprite.setX(Math.floor(sprite.x / 100) * 100 + 50);
-                        sprite.setY(Math.floor(sprite.y / 100) * 100 + 50);
-                        sprite.setDepth(0);
-                    });
+                // sprite.addListener("dragstart", (pointer: any, dragX: number, dragY: number) => {
+                //     if(this.pieces)
+                //         if(dragX < 800 && dragY < 800){
+                //             file = Math.floor((sprite.x - 50) / 100);
+                //             rank = Math.floor((sprite.y - 50) / 100);
+                //         }
+                // });
+                // sprite.addListener("drag", (pointer: any, dragX: number, dragY: number) => {
+                //     if(this.pieces)
+                //         if(dragX < 800 && dragY < 800){
+                //             sprite.setPosition(pointer.x, pointer.y);
+                //         }
+                //     sprite.setDepth(1);
+                // });
 
+                // sprite.addListener("dragend", (pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject, target: Phaser.GameObjects.GameObject) => {
+                //     if(sprite.x > 0 && sprite.x < 800 && sprite.y > 0 && sprite.y < 800) {
+                //         let endfile = Math.floor((pointer.x - 50) / 100);
+                //         let endrank = Math.floor((pointer.y - 50) / 100);
+                //         sprite.setX(Math.floor(sprite.x / 100) * 100 + 50);
+                //         sprite.setY(Math.floor(sprite.y / 100) * 100 + 50);
+                //         sprite.setDepth(0);
 
-                }
-                position.x += 100;
+                //         let piece = this.pieces[8 * rank + file];
+                //         this.pieces[8 * rank + file].pieceType = pieces.none;
+                //         this.pieces[8 * endrank + endfile] = piece;
+                //         // console.log(piece);
+                //         // console.log(this.pieces[8 * endrank + endfile]);
+                //         // console.log(this.pieces[8 * rank + file]);
+                //     }
+                    
+                // });
+
+                this.pieceSprites.push(sprite);
+            } else {
+                //PIECE is not present in current square
             }
-            position.x = 50;
-            position.y += 100;
+                position.x += 100;
+            if((i+1) % 8) {
+            } else {
+                position.x = 50;
+                position.y += 100;
+                
+            }
         }
-    }
+}
+
+makeMove() {
+    
+}
 
 };

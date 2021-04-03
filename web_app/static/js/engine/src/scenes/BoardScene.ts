@@ -2,7 +2,7 @@ import {Board as Board} from '../components/Board';
 
 
 export class BoardScene extends Phaser.Scene {
-    private myBoard = new Board(this, "3qk2r/pp1p1ppp/2bP4/1B1BPp2/2P1p1b1/1n1nrK2/P1PP2PP/RN1Q2NR")
+    private myBoard = new Board(this, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
     constructor(sceneConfig: Phaser.Types.Scenes.SettingsConfig){
         super(sceneConfig);
     };
@@ -25,6 +25,6 @@ export class BoardScene extends Phaser.Scene {
     create() {
         //Create Chess board
         this.myBoard.drawGraphicalBoard();
-        this.add.grid(0,0,8,8,100,100,0xff0000);
     }
+
 };
