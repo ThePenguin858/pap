@@ -13,7 +13,6 @@ export enum moveFlags {
     check = 1,
     enPassant = 2,
     side = 4
-    
 }
 export class Move {
     startSquare: number;

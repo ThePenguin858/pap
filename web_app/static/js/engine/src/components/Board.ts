@@ -1,21 +1,14 @@
 import * as Phaser from 'phaser'
 import * as Move from './Move'
-import { CST, COLORS } from './CST'
+import {CST, COLORS} from './CST'
 
-function ROW(x: number): number {
-    return x >> 3;
-}
-
-function COL(x: number): number {
-    return x & 7;
-}
 export class Board {
-
+    
     private pieces: number[];
     private colors: number[];
     private offset: number[][];
 
-    private side: COLORS = COLORS.WHITE;
+    private side: number = COLORS.WHITE;
     private xside: number = COLORS.BLACK;
     private fifty: number = 0;
     private hash: number = 0;
@@ -26,20 +19,22 @@ export class Board {
 
     private pieceSprites: Phaser.Physics.Arcade.Sprite[];
     private Scene: Phaser.Scene;
+    private initialSpriteDrag: [number,number];
 
     constructor(Scene: Phaser.Scene, FEN: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR") {
         this.Scene = Scene;
-
+        this.initialSpriteDrag = [0,0];
         this.pieces = [];
         this.colors = [];
         this.FEN = FEN;
+        this.side = COLORS.WHITE;
         this.offset = [
-            [ 0, 0, 0, 0, 0, 0, 0, 0 ], //Pawn offsets
-            [ -21, -19, -12, -8, 8, 12, 19, 21 ], // Knight 
-            [ -11, -9, 9, 11, 0, 0, 0, 0 ], //Bishop
-            [ -10, -1, 1, 10, 0, 0, 0, 0 ], //Rook
-            [ -11, -10, -9, -1, 1, 9, 10, 11 ], //Queen
-            [ -11, -10, -9, -1, 1, 9, 10, 11 ] //King
+            [0, 0, 0, 0, 0, 0, 0, 0], //Pawn offsets
+            [-21, -19, -12, -8, 8, 12, 19, 21], // Knight 
+            [-11, -9, 9, 11, 0, 0, 0, 0], //Bishop
+            [-10, -1, 1, 10, 0, 0, 0, 0], //Rook
+            [-11, -10, -9, -1, 1, 9, 10, 11], //Queen
+            [-11, -10, -9, -1, 1, 9, 10, 11] //King
         ];
 
         this.colors = [
@@ -68,17 +63,17 @@ export class Board {
     // Starts at the 22 index, ends in the 86 index
     private mailbox: number[] = [
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, // starts at 21
-            -1, 8, 9, 10, 11, 12, 13, 14, 15, -1,
-            -1, 16, 17, 18, 19, 20, 21, 22, 23, -1,
-            -1, 24, 25, 26, 27, 28, 29, 30, 31, -1,
-            -1, 32, 33, 34, 35, 36, 37, 38, 39, -1,
-            -1, 40, 41, 42, 43, 44, 45, 46, 47, -1,
-            -1, 48, 49, 50, 51, 52, 53, 54, 55, -1,
-            -1, 56, 57, 58, 59, 60, 61, 62, 63, -1, // ends at 98
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, // starts at 21
+        -1, 8, 9, 10, 11, 12, 13, 14, 15, -1,
+        -1, 16, 17, 18, 19, 20, 21, 22, 23, -1,
+        -1, 24, 25, 26, 27, 28, 29, 30, 31, -1,
+        -1, 32, 33, 34, 35, 36, 37, 38, 39, -1,
+        -1, 40, 41, 42, 43, 44, 45, 46, 47, -1,
+        -1, 48, 49, 50, 51, 52, 53, 54, 55, -1,
+        -1, 56, 57, 58, 59, 60, 61, 62, 63, -1, // ends at 98
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
     ];
     private mailbox64: number[] = [
         21, 22, 23, 24, 25, 26, 27, 28,
@@ -90,6 +85,13 @@ export class Board {
         81, 82, 83, 84, 85, 86, 87, 88,
         91, 92, 93, 94, 95, 96, 97, 98
     ];
+
+    screenPosToBoardPos = (ScreenPos: number): number => {
+        return Math.floor((ScreenPos - 50) / 100);
+    }
+    boardPosToScreenPos = (boardPos: number): number => {
+        return boardPos * 100 + 50;
+    }
 
     processFEN() {
         // let boardIndexCounter: number = 0;
@@ -176,53 +178,53 @@ export class Board {
         position.y = 50;
         for (let i = 0; i < 64; i++) {
             let url: string = "";
-            if(this.colors[i] != CST.EMPTY){
-                if(this.colors[i]) { // BLACK Pieces
-                    switch(this.pieces[i]){
+            if (this.colors[i] != CST.EMPTY) {
+                if (this.colors[i]) { // BLACK Pieces
+                    switch (this.pieces[i]) {
                         case CST.PAWN:
                             url = "black_pawn";
-                            break;
+                        break;
                         case CST.KNIGHT:
                             url = "black_knight";
-                            break;
+                        break;
                         case CST.BISHOP:
                             url = "black_bishop";
-                            break;
+                        break;
                         case CST.ROOK:
                             url = "black_rook";
-                            break;
+                        break;
                         case CST.QUEEN:
                             url = "black_queen";
-                            break;
+                        break;
                         case CST.KING:
                             url = "black_king";
-                            break;
+                        break;
                     }
                 } else { // WHITE Pieces
-                    switch(this.pieces[i]){
+                    switch (this.pieces[i]) {
                         case CST.PAWN:
                             url = "white_pawn";
-                            break;
+                        break;
                         case CST.KNIGHT:
                             url = "white_knight";
-                            break;
+                        break;
                         case CST.BISHOP:
                             url = "white_bishop";
-                            break;
+                        break;
                         case CST.ROOK:
                             url = "white_rook";
-                            break;
+                        break;
                         case CST.QUEEN:
                             url = "white_queen";
-                            break;
+                        break;
                         case CST.KING:
                             url = "white_king";
-                            break;
+                        break;
                     }
                 }
                 let sprite = this.Scene.physics.add.sprite(position.x, position.y, url);
-                let file = Math.floor((sprite.x - 50) / 100);
-                let rank = Math.floor((sprite.y - 50) / 100);
+                let file = this.screenPosToBoardPos(sprite.x);
+                let rank = this.screenPosToBoardPos(sprite.y);
 
                 sprite.scale = 0.3;
                 sprite.setBodySize(150, 150);
@@ -234,30 +236,40 @@ export class Board {
 
                 /* This piece of code is to handle the drag input of the pieces and translate
                  * it into the mailbox board representation */
-                
-                sprite.addListener("dragstart", (pointer: any, dragX: number, dragY: number) => {
-                    if(dragX < 800 && dragY < 800){
-                        file = Math.floor((sprite.x - 50) / 100);
-                        rank = Math.floor((sprite.y - 50) / 100);
+
+                sprite.addListener("dragstart", (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
+                    if (dragX < 800 && dragY < 800 ) {
+                        file = this.screenPosToBoardPos(sprite.x);
+                        rank = this.screenPosToBoardPos(sprite.y);
                         console.log("File: " + file + " rank: " + rank);
+                            this.initialSpriteDrag[0] = this.boardPosToScreenPos(file);
+                            this.initialSpriteDrag[1] = this.boardPosToScreenPos(rank);
                     }
                 });
                 sprite.addListener("drag", (pointer: any, dragX: number, dragY: number) => {
-                    if(dragX < 800 && dragY < 800){
+                    if (dragX < 800 && dragY < 800) {
                         sprite.setPosition(pointer.x, pointer.y);
                     }
                 });
 
                 sprite.addListener("dragend", (pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject, target: Phaser.GameObjects.GameObject) => {
-                    if(sprite.x > 0 && sprite.x < 800 && sprite.y > 0 && sprite.y < 800) {
-                        sprite.setX(Math.floor(sprite.x / 100) * 100 + 50);
-                        sprite.setY(Math.floor(sprite.y / 100) * 100 + 50);
-                        file = Math.floor((sprite.x - 50) / 100);
-                        rank = Math.floor((sprite.y - 50) / 100);
-                        //If collision is true, delete the sprite and set the value on the mailbox to the new piece
-                        let indexToDestroy = this.checkForCollisions(sprite);
-                        // if(indexToDestroy > -1)
-                        //     sprite.destroy();
+                    if (sprite.x > 0 && sprite.x < 800 && sprite.y > 0 && sprite.y < 800) {
+                        if(this.colors[i] == this.side){
+                            /* This piece of code centralizes the objects in a grid square */
+                            sprite.setX(Math.floor(sprite.x / 100) * 100 + 50);
+                            sprite.setY(Math.floor(sprite.y / 100) * 100 + 50);
+
+                            let indexOfSquareCapture = this.checkForCollisions(sprite);
+                            if (indexOfSquareCapture > -1){
+                                file = Math.floor((sprite.x - 50) / 100);
+                                rank = Math.floor((sprite.y - 50) / 100);
+                                //If collision is true, delete the sprite and set the value on the mailbox to the new piece
+                            }                            
+                            this.side = +!this.side;
+                            console.log(this.side);
+                        } else {
+                            sprite.setPosition(this.initialSpriteDrag[0], this.initialSpriteDrag[1]);
+                        }
                     }
                 });
                 this.pieceSprites.push(sprite);
@@ -266,33 +278,36 @@ export class Board {
                 //PIECE is not present in current square
             }
             position.x += 100;
-            if((i+1) % 8) {
+            if ((i + 1) % 8) {
             } else {
                 position.x = 50;
                 position.y += 100;
             }
-       }
-    }
+        }
+    };
 
+    /* This function will return the mailbox64 index of the square where the piece was put.
+       If a collision was not detected, it will return a -1.
+    */
     checkForCollisions(sprite1: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody): number {
         this.pieceSprites.forEach((sprite2) => {
-                if(this.Scene.physics.overlap(sprite1, sprite2)){
-                    let index = this.pieceSprites.indexOf(sprite2, 0);
-                    delete this.pieceSprites[index];
-                    console.log("sprite 1 two pieces collided");
-                    sprite2.destroy();
-                    sprite1.setTint(0x00ff00);
-                    return 1;
-                }else {
-                    sprite1.setDepth(0);
-                }
+            if (this.Scene.physics.overlap(sprite1, sprite2)) {
+                let index = this.pieceSprites.indexOf(sprite2, 0);
+                delete this.pieceSprites[index];
+                sprite2.destroy();
+                //Discover the index of the mailbox that its going to land
+
+                return 1;
+            } else {
+                sprite1.setDepth(0);
+            }
         });
         return -1;
 
     };
 
     makeMove() {
-        
+
     }
 
 };

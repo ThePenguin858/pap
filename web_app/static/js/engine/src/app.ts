@@ -26,7 +26,5 @@ const config: Phaser.Types.Core.GameConfig = {
     },
     scene: [BoardScene],
 }
-
 export let game = new Phaser.Game(config);
-
 export let TextureManager = new Phaser.Textures.TextureManager(game);
