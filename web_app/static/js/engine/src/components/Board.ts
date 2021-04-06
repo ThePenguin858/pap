@@ -266,6 +266,7 @@ export class Board {
                                 //If collision is true, delete the sprite and set the value on the mailbox to the new piece
                             }                            
                             this.side = +!this.side;
+                            this.xside = +!this.xside;
                             console.log(this.side);
                         } else {
                             sprite.setPosition(this.initialSpriteDrag[0], this.initialSpriteDrag[1]);
