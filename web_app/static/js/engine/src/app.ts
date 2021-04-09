@@ -12,7 +12,7 @@ const config: Phaser.Types.Core.GameConfig = {
         mode: Phaser.Scale.FIT,
         parent: 'game-area',
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: 1000,
+        width: 800,
         height: 800
     },
     physics: {

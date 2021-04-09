@@ -1,3 +1,5 @@
+import { PIECES, COLORS, CASTLING} from './CST';
+
 export enum enumSquare {
   a1, b1, c1, d1, e1, f1, g1, h1,
   a2, b2, c2, d2, e2, f2, g2, h2,
@@ -9,24 +11,35 @@ export enum enumSquare {
   a8, b8, c8, d8, e8, f8, g8, h8
 };
 
-export enum moveFlags {
-    check = 1,
-    enPassant = 2,
-    side = 4
+export type moveFlags = {
+    check?: boolean;
+    en_passant?: boolean;
+    castling?: CASTLING;
+    promotion?: PIECES;
 }
+
 export class Move {
     startSquare: number;
     endSquare: number;
-    flags: number;
+    flags: moveFlags | undefined;
 
-    constructor(start: number, end: number, flags: number = 0) {
+    constructor(start: number, end: number, flags?: moveFlags) {
         this.startSquare = start;
         this.endSquare = end;
         this.flags = flags;
     }
+
     toString(): string{
         let start = enumSquare[this.startSquare].toString();
         let end = enumSquare[this.endSquare].toString();
         return start + end;
     }
+
+    isValid(): boolean{
+        if(this.startSquare == this.endSquare)
+            return false;
+
+        return true;
+    };
+
 }
