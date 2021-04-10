@@ -2,7 +2,7 @@ import {Board as Board} from '../components/Board';
 
 
 export class BoardScene extends Phaser.Scene {
-    private myBoard = new Board(this, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    private myBoard = new Board(this);
     constructor(sceneConfig: Phaser.Types.Scenes.SettingsConfig){
         super(sceneConfig);
     };
@@ -25,6 +25,10 @@ export class BoardScene extends Phaser.Scene {
     create() {
         //Create Chess board
         this.myBoard.drawGraphicalBoard();
+        let key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        key.on("down", (key: any, event: any) => {
+            this.myBoard.unmakeMove();
+        });
     }
 
     update() {

@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser'
 import * as Move from './Move'
-import {PIECES, COLORS} from './CST'
+import * as CST from './CST'
 
 export class Board {
 
@@ -8,14 +8,17 @@ export class Board {
     private colors: number[];
     private offset: number[][];
 
-    private side: number = COLORS.WHITE;
-    private xside: number = COLORS.BLACK;
+    private side: number = CST.COLORS.WHITE;
+    private xside: number = CST.COLORS.BLACK;
     private fifty: number = 0;
     private moveCount: number = 0;
     private hash: number = 0;
     private ply: number = 0;
     private hply: number = 0;
-    private moves: Move.Move[];
+    private moveList: Move.Move[];
+    private possibleMoves: Move.Move[];
+    private capturedPieces: number[];
+    private capturedColors: number[];
 
     private FEN: string
 
@@ -26,12 +29,15 @@ export class Board {
 
     constructor(Scene: Phaser.Scene, FEN: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 30 23") {
         this.Scene = Scene;
-        this.moves = [];
+        this.moveList = [];
+        this.possibleMoves =[];
+        this.capturedPieces =[];
+        this.capturedColors =[];
         this.initialSpriteDrag = [0, 0];
         this.pieces = [];
         this.colors = [];
         this.FEN = FEN;
-        this.side = COLORS.WHITE;
+        this.side = CST.COLORS.WHITE;
         this.offset = [
             [0, 0, 0, 0, 0, 0, 0, 0], //Pawn offsets
             [-21, -19, -12, -8, 8, 12, 19, 21], // Knight 
@@ -40,6 +46,11 @@ export class Board {
             [-11, -10, -9, -1, 1, 9, 10, 11], //Queen
             [-11, -10, -9, -1, 1, 9, 10, 11] //King
         ];
+
+        this.possibleMoves.push(new Move.Move(CST.SQUARES.E2,CST.SQUARES.E4));
+        this.possibleMoves.push(new Move.Move(CST.SQUARES.C7,CST.SQUARES.C5));
+        this.possibleMoves.push(new Move.Move(CST.SQUARES.D2,CST.SQUARES.D4));
+        this.possibleMoves.push(new Move.Move(CST.SQUARES.C5,CST.SQUARES.D4));
 
         this.colors = [
             1, 1, 1, 1, 1, 1, 1, 1,
@@ -65,6 +76,7 @@ export class Board {
         this.pieceSprites = [];
 
         this.currentMove = new Move.Move(0, 0);
+        this.processFEN();
     }
     // Starts at the 22 index, ends in the 86 index
     private mailbox: number[] = [
@@ -98,7 +110,6 @@ export class Board {
     boardPosToScreenPos = (boardPos: number): number => {
         return boardPos * 100 + 50;
     }
-
     processFEN() {
         let sections = this.FEN.split(" ");
 
@@ -111,104 +122,51 @@ export class Board {
                 if (parseInt(char)) {
                     let space = parseInt(char);
                     for (let j = 0; j < space; j++) {
-                        this.pieces[square] = PIECES.EMPTY;
-                        this.colors[square] = PIECES.EMPTY;
+                        this.pieces[square] = CST.PIECES.EMPTY;
+                        this.colors[square] = CST.PIECES.EMPTY;
                         square++;
                     }
                 } else {
 
-                    if (char == char.toUpperCase()) {
-                        this.colors[square] = COLORS.BLACK; // Char is Uppecase
-                    } else {
-                        this.colors[square] = COLORS.WHITE; // Char is Lowercase
-                    }
+                    if (char == char.toUpperCase())
+                        this.colors[square] = CST.COLORS.WHITE; // Char is Lowercase
+                    else
+                        this.colors[square] = CST.COLORS.BLACK; // Char is Uppecase
+
                     char.toLowerCase();
                     switch (char) {
                         case "k":
-                            this.pieces[square] = PIECES.KING;
+                            this.pieces[square] = CST.PIECES.KING;
                             break;
                         case "q":
-                            this.pieces[square] = PIECES.QUEEN;
-                            break;
+                            this.pieces[square] = CST.PIECES.QUEEN;
+
                         case "n":
-                            this.pieces[square] = PIECES.KNIGHT;
+                            this.pieces[square] = CST.PIECES.KNIGHT;
                             break;
                         case "p":
-                            this.pieces[square] = PIECES.PAWN;
+                            this.pieces[square] = CST.PIECES.PAWN;
                             break;
                         case "b":
-                            this.pieces[square] = PIECES.BISHOP;
+                            this.pieces[square] = CST.PIECES.BISHOP;
                             break;
                         case "r":
-                            this.pieces[square] = PIECES.ROOK;
+                            this.pieces[square] = CST.PIECES.ROOK;
                             break;
                     }
-                    console.log(square);
                     square++;
                 }
             }
         }
 
-
-
-        /* for (let square = 0; square < 64; square++) { */
-        /*     if(sections[0].length < 70){ */
-        /*     let char = sections[0].charAt(square).toLowerCase(); */
-        /*     let code = sections[0].charCodeAt(square); */
-        /*     if (parseInt(char)) { */
-        /*         let space = parseInt(char); */
-        /*         console.log(space); */
-
-        /*         for (let i = 0; i < space - 1; i++) { */
-        /*             this.pieces[square] = PIECES.EMPTY; */
-        /*             this.colors[square] = PIECES.EMPTY; */
-        /*             square++; */
-        /*             console.log(square); */
-        /*         } */
-        /*         square--; */
-        /*             console.log(square); */
-                
-        /*     } else { */
-        /*         if (code <= 97) { */
-        /*             this.colors[square] = COLORS.BLACK; // Char is Uppecase */
-        /*         } else { */
-        /*             this.colors[square] = COLORS.WHITE; // Char is Lowercase */
-        /*         } */
-        /*         switch (char) { */
-        /*             case "/": */
-        /*                 break */
-        /*             case "k": */
-        /*                 this.pieces[square] = PIECES.KNIGHT; */
-        /*                 break; */
-        /*             case "q": */
-        /*                 this.pieces[square] = PIECES.QUEEN; */
-        /*                 break; */
-        /*             case "n": */
-        /*                 this.pieces[square] = PIECES.KNIGHT; */
-        /*                 break; */
-        /*             case "p": */
-        /*                 this.pieces[square] = PIECES.PAWN; */
-        /*                 break; */
-        /*             case "b": */
-        /*                 this.pieces[square] = PIECES.BISHOP; */
-        /*                 break; */
-        /*             case "r": */
-        /*                 this.pieces[square] = PIECES.ROOK; */
-        /*                 break; */
-        /*         } */
-        /*     } */
-        /*     console.log(square); */
-        /*     } */
-        /* } */
-
         ////////////////////////////////////////////////////////////////////
         // This is the section that handles the side to play
         if (sections[1].charAt(0) == "w") {
-            this.side == COLORS.WHITE;
-            this.xside == COLORS.BLACK;
+            this.side == CST.COLORS.WHITE;
+            this.xside == CST.COLORS.BLACK;
         } else {
-            this.xside == COLORS.WHITE;
-            this.side == COLORS.BLACK;
+            this.xside == CST.COLORS.WHITE;
+            this.side == CST.COLORS.BLACK;
 
         }
         ////////////////////////////////////////////////////////////////////
@@ -220,20 +178,13 @@ export class Board {
         ////////////////////////////////////////////////////////////////////
         /* This is the section that handles the number of halfmoves */
         this.fifty = parseInt(sections[4]);
-        console.log("Fifty" + this.fifty);
 
         ////////////////////////////////////////////////////////////////////
         /* This is the section that handles the number of moves */
         this.moveCount = parseInt(sections[5]);
-        console.log("Moves" + this.moveCount);
-
-
-        console.log(this.pieces);
-        console.log(this.colors);
     }
 
     drawGraphicalBoard() {
-        this.processFEN();
         let position: Phaser.Math.Vector2 = new Phaser.Math.Vector2(50, 50);
         let squareWidth = 100;
 
@@ -256,46 +207,46 @@ export class Board {
         position.y = 50;
         for (let i = 0; i < 64; i++) {
             let url: string = "";
-            if (this.colors[i] != PIECES.EMPTY) {
+            if (this.colors[i] != CST.PIECES.EMPTY) {
                 if (this.colors[i]) { // BLACK Pieces
                     switch (this.pieces[i]) {
-                        case PIECES.PAWN:
+                        case CST.PIECES.PAWN:
                             url = "black_pawn";
                             break;
-                        case PIECES.KNIGHT:
+                        case CST.PIECES.KNIGHT:
                             url = "black_knight";
                             break;
-                        case PIECES.BISHOP:
+                        case CST.PIECES.BISHOP:
                             url = "black_bishop";
                             break;
-                        case PIECES.ROOK:
+                        case CST.PIECES.ROOK:
                             url = "black_rook";
                             break;
-                        case PIECES.QUEEN:
+                        case CST.PIECES.QUEEN:
                             url = "black_queen";
                             break;
-                        case PIECES.KING:
+                        case CST.PIECES.KING:
                             url = "black_king";
                             break;
                     }
                 } else { // WHITE Pieces
                     switch (this.pieces[i]) {
-                        case PIECES.PAWN:
+                        case CST.PIECES.PAWN:
                             url = "white_pawn";
                             break;
-                        case PIECES.KNIGHT:
+                        case CST.PIECES.KNIGHT:
                             url = "white_knight";
                             break;
-                        case PIECES.BISHOP:
+                        case CST.PIECES.BISHOP:
                             url = "white_bishop";
                             break;
-                        case PIECES.ROOK:
+                        case CST.PIECES.ROOK:
                             url = "white_rook";
                             break;
-                        case PIECES.QUEEN:
+                        case CST.PIECES.QUEEN:
                             url = "white_queen";
                             break;
-                        case PIECES.KING:
+                        case CST.PIECES.KING:
                             url = "white_king";
                             break;
                     }
@@ -314,14 +265,26 @@ export class Board {
 
                 /* This piece of code is to handle the drag input of the pieces and translate
                  * it into the mailbox board representation */
-
                 sprite.addListener("dragstart", (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
                     if (dragX < 800 && dragY < 800) {
+
+                        /* Generate all possible moves at this stage */
+
+                        /* Save the initial position of the piece so that a move
+                           can be saved */
                         file = this.screenPosToBoardPos(sprite.x);
                         rank = this.screenPosToBoardPos(sprite.y);
-                        console.log("File: " + file + " rank: " + rank);
+                        let to = 8 * rank + file;
+                        if(this.colors[to] == this.side){
+
+                            this.currentMove.from = to;
+                        }
+
+                        /* This saves the initial position of the sprite so it
+                           can be resetted */
                         this.initialSpriteDrag[0] = this.boardPosToScreenPos(file);
                         this.initialSpriteDrag[1] = this.boardPosToScreenPos(rank);
+
                     }
                 });
                 sprite.addListener("drag", (pointer: any, dragX: number, dragY: number) => {
@@ -329,26 +292,42 @@ export class Board {
                         sprite.setPosition(pointer.x, pointer.y);
                     }
                 });
-
+                let counter = 0;
                 sprite.addListener("dragend", (pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject, target: Phaser.GameObjects.GameObject) => {
                     if (sprite.x > 0 && sprite.x < 800 && sprite.y > 0 && sprite.y < 800) {
-                        if (this.colors[i] == this.side) {
-                            /* This piece of code centralizes the objects in a grid square */
-                            sprite.setX(Math.floor(sprite.x / 100) * 100 + 50);
-                            sprite.setY(Math.floor(sprite.y / 100) * 100 + 50);
 
-                            let indexOfSquareCapture = this.checkForCollisions(sprite);
-                            if (indexOfSquareCapture > -1) {
-                                file = Math.floor((sprite.x - 50) / 100);
-                                rank = Math.floor((sprite.y - 50) / 100);
-                                //If collision is true, delete the sprite and set the value on the mailbox to the new piece
-                            }
-                            this.side = +!this.side;
-                            this.xside = +!this.xside;
-                            console.log(this.side);
-                        } else {
+                        file = Math.floor(sprite.x / 100);
+                        rank = Math.floor(sprite.y / 100);
+                        let to = 8 * rank + file;
+
+                        if (this.colors[this.currentMove.from] == this.side) {
+                            this.currentMove.to = to;
+                            if (this.isMoveValid(this.currentMove)) { // MOVE IS VALID
+
+                                /* This piece of code centralizes the objects in a grid square */
+                                sprite.setX(Math.floor(sprite.x / 100) * 100 + 50);
+                                sprite.setY(Math.floor(sprite.y / 100) * 100 + 50);
+
+
+                                /* This checks if sprites have collided */
+                                this.checkForCollisions(sprite);
+
+
+                                /* This switches the color to move */
+                                this.side = +!this.side;
+                                this.xside = +!this.xside;
+
+                                counter++;
+
+                                /* Make the move on the board */
+                                this.makeMove(this.currentMove);
+                            } else
+                                sprite.setPosition(this.initialSpriteDrag[0], this.initialSpriteDrag[1]);
+                        } else{
                             sprite.setPosition(this.initialSpriteDrag[0], this.initialSpriteDrag[1]);
+                            this.currentMove.to = this.currentMove.from;
                         }
+
                     }
                 });
                 this.pieceSprites.push(sprite);
@@ -367,14 +346,12 @@ export class Board {
     /* This function will return the mailbox64 index of the square where the piece was put.
        If a collision was not detected, it will return a -1.
      */
-    checkForCollisions(sprite1: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody): number {
+    private checkForCollisions(sprite1: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody): number {
         this.pieceSprites.forEach((sprite2) => {
             if (this.Scene.physics.overlap(sprite1, sprite2)) {
                 let index = this.pieceSprites.indexOf(sprite2, 0);
                 delete this.pieceSprites[index];
                 sprite2.destroy();
-                //Discover the index of the mailbox that its going to land
-
                 return 1;
             } else {
                 sprite1.setDepth(0);
@@ -384,8 +361,88 @@ export class Board {
 
     };
 
-    makeMove() {
+
+    private setFlagsForMove(move: Move.Move, start: number, end: number){
+    }
+    private isMoveValid(move: Move.Move): boolean {
+        let index = this.possibleMoves.findIndex((funcMove) => {
+            if(funcMove.from == move.from && funcMove.to == move.to)
+                return funcMove;
+        })
+        if (index > -1) {
+            return true;
+        } else
+            return false;
+    }
+
+    restartBoard(){
+        this.pieceSprites.forEach((sprite2) => {
+            let index = this.pieceSprites.indexOf(sprite2, 0);
+            sprite2.destroy();
+            delete this.pieceSprites[index];
+        });
+        this.drawGraphicalBoard();
+    }
+
+    private makeMove(move: Move.Move, draw: boolean = false) {
+        if(this.pieces[move.to] != CST.PIECES.EMPTY){
+            this.capturedColors.push(this.colors[move.to]);
+            this.capturedPieces.push(this.pieces[move.to]);
+        }else{
+
+            this.capturedColors.push(CST.PIECES.EMPTY);
+            this.capturedPieces.push(CST.PIECES.EMPTY);
+        }
+        let yy = new Move.Move(move.from, move.to);
+        this.moveList.push(yy);
+        this.colors[move.to] = this.colors[move.from];
+        this.pieces[move.to] = this.pieces[move.from];
+
+        this.colors[move.from] = CST.PIECES.EMPTY;
+        this.pieces[move.from] = CST.PIECES.EMPTY;
+
+        console.log(this.moveList);
+        console.log(this.capturedColors);
+        console.log(this.capturedPieces);
+
+        /* Reset the moves that can be made */
+        this.generateMoves();
 
     }
+
+    unmakeMove() {
+        let move = this.moveList.pop();
+        let piece = this.capturedPieces.pop();
+        let color = this.capturedColors.pop();
+        /* Set the colors of the board */
+        if(typeof(move) != 'undefined' && typeof(piece) != 'undefined' && typeof(color) != 'undefined'){
+
+            /* Revert the pieces on the board */
+            console.log(this.moveList);
+            console.log(this.capturedColors);
+            console.log(this.capturedPieces);
+            this.colors[move.from] = this.colors[move.to];
+            this.colors[move.to] = color;
+
+            /* Revert the pieces on the board */
+            this.pieces[move.from] = this.pieces[move.to];
+            this.pieces[move.to] = piece;
+
+
+            /* Revert the side to play */
+            this.side = +!this.side;
+            this.xside = +!this.xside;
+
+
+            /* Restart the visual board */
+        }
+            this.restartBoard();
+    }
+
+    private generateMoves() {
+
+
+
+    };
 
 };
