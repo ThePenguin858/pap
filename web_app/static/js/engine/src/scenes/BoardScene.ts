@@ -1,11 +1,15 @@
 import {Board as Board} from '../components/Board';
 
-
+export let myBoard: Board;
 export class BoardScene extends Phaser.Scene {
-    private myBoard = new Board(this);
     constructor(sceneConfig: Phaser.Types.Scenes.SettingsConfig){
         super(sceneConfig);
+        myBoard = new Board(this);
     };
+
+    init(){
+        myBoard = new Board(this);
+    }
 
     preload() {
         this.load.image("white_pawn", "/static/images/pieces/white_pawn.png");
@@ -24,10 +28,16 @@ export class BoardScene extends Phaser.Scene {
     };
     create() {
         //Create Chess board
-        this.myBoard.drawGraphicalBoard();
+        myBoard.drawGraphicalBoard();
         let key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        let keyd = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O);
+
         key.on("down", (key: any, event: any) => {
-            this.myBoard.unmakeMove();
+            myBoard.unmakeMove();
+        });
+
+        keyd.on("down", (key: any, event: any) => {
+            this.scene.start("game_end", {endType: myBoard.gameState});
         });
     }
 

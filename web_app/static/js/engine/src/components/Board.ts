@@ -1,12 +1,14 @@
 import * as Phaser from 'phaser'
 import * as Move from './Move'
 import * as CST from './CST'
+import {DEPTH_SET, DEPTH_DRAG} from './CST'
 
 export class Board {
 
     private pieces: number[];
     private colors: number[];
 
+    gameState: CST.GAME_STATES = CST.GAME_STATES.PLAYING;
     private side: number = CST.COLORS.WHITE;
     private xside: number = CST.COLORS.BLACK;
     private fifty: number = 0;
@@ -26,43 +28,43 @@ export class Board {
     private Scene: Phaser.Scene;
     private pieceSprites: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody[];
 
-    constructor(Scene: Phaser.Scene, FEN: string = "rrrqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 30 23") {
+    constructor(Scene: Phaser.Scene, FEN: string = "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R b KQkq - 30 23") {
         this.Scene = Scene;
         this.moveList = [];
-        this.possibleMoves =[];
-        this.capturedPieces =[];
-        this.capturedColors =[];
+        this.possibleMoves = [];
+        this.capturedPieces = [];
+        this.capturedColors = [];
         this.initialSpriteDrag = [0, 0];
         this.pieces = [];
         this.colors = [];
         this.FEN = FEN;
         this.side = CST.COLORS.WHITE;
 
-        this.possibleMoves.push(new Move.Move(CST.SQUARES.E2,CST.SQUARES.E4));
-        this.possibleMoves.push(new Move.Move(CST.SQUARES.C7,CST.SQUARES.C5));
-        this.possibleMoves.push(new Move.Move(CST.SQUARES.D2,CST.SQUARES.D4));
-        this.possibleMoves.push(new Move.Move(CST.SQUARES.C5,CST.SQUARES.D4));
+        this.possibleMoves.push(new Move.Move(CST.SQUARES.E2, CST.SQUARES.E4));
+        this.possibleMoves.push(new Move.Move(CST.SQUARES.C7, CST.SQUARES.C5));
+        this.possibleMoves.push(new Move.Move(CST.SQUARES.D2, CST.SQUARES.D4));
+        this.possibleMoves.push(new Move.Move(CST.SQUARES.C5, CST.SQUARES.D4));
 
         this.colors = [
-             1, 1, 1, 1, 1, 1, 1, 1, 
-             1, 1, 1, 1, 1, 1, 1, 1, 
-             6, 6, 6, 6, 6, 6, 6, 6, 
-             6, 6, 6, 6, 6, 6, 6, 6, 
-             6, 6, 6, 6, 6, 6, 6, 6, 
-             6, 6, 6, 6, 6, 6, 6, 6, 
-             0, 0, 0, 0, 0, 0, 0, 0, 
-             0, 0, 0, 0, 0, 0, 0, 0 
+            1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1,
+            6, 6, 6, 6, 6, 6, 6, 6,
+            6, 6, 6, 6, 6, 6, 6, 6,
+            6, 6, 6, 6, 6, 6, 6, 6,
+            6, 6, 6, 6, 6, 6, 6, 6,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0
         ];
 
         this.pieces = [
-             3, 1, 2, 4, 5, 2, 1, 3, 
-             0, 0, 0, 0, 0, 0, 0, 0, 
-             6, 6, 6, 6, 6, 6, 6, 6, 
-             6, 6, 6, 6, 6, 6, 6, 6, 
-             6, 6, 6, 6, 6, 6, 6, 6, 
-             6, 6, 6, 6, 6, 6, 6, 6, 
-             0, 0, 0, 0, 0, 0, 0, 0, 
-             3, 1, 2, 4, 5, 2, 1, 3 
+            3, 1, 2, 4, 5, 2, 1, 3,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            6, 6, 6, 6, 6, 6, 6, 6,
+            6, 6, 6, 6, 6, 6, 6, 6,
+            6, 6, 6, 6, 6, 6, 6, 6,
+            6, 6, 6, 6, 6, 6, 6, 6,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            3, 1, 2, 4, 5, 2, 1, 3
         ];
         this.pieceSprites = [];
 
@@ -73,14 +75,14 @@ export class Board {
     private mailbox: number[] = [
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, 0, 1, 2, 3, 4, 5, 6, 7, -1, 
+        -1, 0, 1, 2, 3, 4, 5, 6, 7, -1,
         -1, 8, 9, 10, 11, 12, 13, 14, 15, -1,
         -1, 16, 17, 18, 19, 20, 21, 22, 23, -1,
         -1, 24, 25, 26, 27, 28, 29, 30, 31, -1,
         -1, 32, 33, 34, 35, 36, 37, 38, 39, -1,
         -1, 40, 41, 42, 43, 44, 45, 46, 47, -1,
         -1, 48, 49, 50, 51, 52, 53, 54, 55, -1,
-        -1, 56, 57, 58, 59, 60, 61, 62, 63, -1, 
+        -1, 56, 57, 58, 59, 60, 61, 62, 63, -1,
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
     ];
@@ -168,9 +170,9 @@ export class Board {
         /* This is the section that handles the number of moves */
         this.moveCount = parseInt(sections[5]);
     }
-    
+
     /*Desenha os quadrados que compõem o tabuleiro*/
-    private drawSquares(){
+    private drawSquares() {
         let position: Phaser.Math.Vector2 = new Phaser.Math.Vector2(50, 50);
         let squareWidth = 100;
 
@@ -191,13 +193,13 @@ export class Board {
     }
 
     /*Retorna o Url da peça a partir da cor e tipo*/
-    getPieceUrlByType(piece: number, color: CST.COLORS){
+    getPieceUrlByType(piece: number, color: CST.COLORS) {
         let url: string;
-        if(color == CST.COLORS.WHITE)
+        if (color == CST.COLORS.WHITE)
             url = "white_";
         else
             url = "black_";
-    
+
         switch (piece) {
             case CST.PIECES.PAWN:
                 url += "pawn";
@@ -217,8 +219,8 @@ export class Board {
             case CST.PIECES.KING:
                 url += "king";
                 break;
-            }
-            return url;
+        }
+        return url;
     }
 
     /*Draws the squares and pieces of the board*/
@@ -231,9 +233,10 @@ export class Board {
         position.y = 50;
         for (let i = 0; i < 64; i++) {
             if (this.colors[i] != CST.PIECES.EMPTY) {
-            let url: string = "";
-                url = this.getPieceUrlByType(this.pieces[i],this.colors[i]);
+                let url: string = "";
+                url = this.getPieceUrlByType(this.pieces[i], this.colors[i]);
                 let piece = this.Scene.physics.add.sprite(position.x, position.y, url);
+                piece.setDepth(DEPTH_SET);
 
                 /* Sprite initialization */
                 piece.scale = 0.3;
@@ -252,7 +255,8 @@ export class Board {
                 piece.addListener("dragstart", (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
                     if (dragX < 800 && dragY < 800) {
                         let to = getBoardIndex();
-                        if(this.colors[to] == this.side){
+                        piece.setDepth(DEPTH_DRAG);
+                        if (this.colors[to] == this.side) {
                             this.currentMove.from = to;
                             /* this.generateMoves(); */
                         }
@@ -274,7 +278,7 @@ export class Board {
                 piece.addListener("dragend", (pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject, target: Phaser.GameObjects.GameObject) => {
                     if (piece.x > 0 && piece.x < 800 && piece.y > 0 && piece.y < 800) {
                         if (this.colors[this.currentMove.from] == this.side) {
-                            
+
                             this.currentMove.to = getBoardIndex();;
                             if (this.isMoveValid(this.currentMove)) { // MOVE IS VALID
 
@@ -293,13 +297,15 @@ export class Board {
 
                                 /* Make the move on the board */
                                 this.makeMove(this.currentMove);
+
+                                /* Set the depth of the piece to be behind the (to exist) drag piece */
                             } else
                                 piece.setPosition(this.initialSpriteDrag[0], this.initialSpriteDrag[1]);
-                        } else{
+                        } else {
                             piece.setPosition(this.initialSpriteDrag[0], this.initialSpriteDrag[1]);
                             this.currentMove.to = this.currentMove.from;
                         }
-
+                        piece.setDepth(DEPTH_SET);
                     }
                 });
                 this.pieceSprites.push(piece);
@@ -332,13 +338,13 @@ export class Board {
     };
 
 
-    private setFlagsForMove(move: Move.Move, start: number, end: number){
+    private setFlagsForMove(move: Move.Move, start: number, end: number) {
     }
     /*Retorna verdadeiro se o movimento feito se encotrar na list de movimentos 
     possíveis*/
     private isMoveValid(move: Move.Move): boolean {
         let index = this.possibleMoves.findIndex((funcMove) => {
-            if(funcMove.from == move.from && funcMove.to == move.to)
+            if (funcMove.from == move.from && funcMove.to == move.to)
                 return funcMove;
         })
         if (index > -1) {
@@ -346,9 +352,9 @@ export class Board {
         } else
             return false;
     }
-    
+
     /*Apaga todas as sprites do jogo para ser reiniciado*/
-    restartBoard(){
+    restartBoard() {
         this.pieceSprites.forEach((sprite2) => {
             let index = this.pieceSprites.indexOf(sprite2, 0);
             sprite2.destroy();
@@ -359,11 +365,11 @@ export class Board {
 
     private makeMove(move: Move.Move, draw: boolean = false) {
         /*Decide se o move foi uma captura*/
-        if(this.pieces[move.to] != CST.PIECES.EMPTY){
+        if (this.pieces[move.to] != CST.PIECES.EMPTY) {
             /* Captura */
-            this.capturedColors.push(this.colors[move.to]); 
+            this.capturedColors.push(this.colors[move.to]);
             this.capturedPieces.push(this.pieces[move.to]);
-        }else{
+        } else {
             /* Não capture */
             this.capturedColors.push(CST.PIECES.EMPTY);
             this.capturedPieces.push(CST.PIECES.EMPTY);
@@ -378,6 +384,10 @@ export class Board {
         this.colors[move.from] = CST.PIECES.EMPTY;
         this.pieces[move.from] = CST.PIECES.EMPTY;
 
+        /* Castling moves */
+
+
+        /* en passant square */
 
         /* Reset the moves that can be made */
         /* this.generateMoves(); */
@@ -388,7 +398,7 @@ export class Board {
         let move = this.moveList.pop();
         let piece = this.capturedPieces.pop();
         let color = this.capturedColors.pop();
-        if(typeof(move) != 'undefined' && typeof(piece) != 'undefined' && typeof(color) != 'undefined'){
+        if (typeof (move) != 'undefined' && typeof (piece) != 'undefined' && typeof (color) != 'undefined') {
 
             /*Reverter as cores*/
             this.colors[move.from] = this.colors[move.to];
@@ -406,7 +416,7 @@ export class Board {
 
             /* Restart the visual board */
         }
-            this.restartBoard();
+        this.restartBoard();
     }
 
     private generateMoves(piece: number) {

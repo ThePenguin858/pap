@@ -16,6 +16,13 @@ export const enum COLORS {
     WHITE = 0,
     BLACK = 1,
 }
+
+export const enum GAME_STATES {
+    PLAYING,
+    DRAW,
+    WHITE_WON,
+    BLACK_WON,
+}
 export enum SQUARES {
   A8, B8, C8, D8, E8, F8, G8, H8,
   A7, B7, C7, D7, E7, F7, G7, H7,
@@ -26,6 +33,9 @@ export enum SQUARES {
   A2, B2, C2, D2, E2, F2, G2, H2,
   A1, B1, C1, D1, E1, F1, G1, H1,
 };
+
+export const DEPTH_DRAG = 1;
+export const DEPTH_SET = 0;
 
 export let OFFSET: number[][] = [
     [0, 0, 0, 0, 0, 0, 0, 0], //Pawn offsets
